@@ -9,3 +9,8 @@ def exists(client, path):
     except RemoteCommandError:
         return False
     return True
+
+
+def ls(client, path):
+    return client.exec_command(
+        "ls wordpress/web/app/uploads").split("\n")
