@@ -19,15 +19,22 @@ class WordpressClient:
             "cd wordpress && vendor/bin/wp core version")
 
     def export_database(self, filepath):
-        data = self.remote_client.exec_command(
-            "cd wordpress && vendor/bin/wp db export -")
-        with open(filepath, "w") as file:
-            file.write(data)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        home_path = self.remote_client.exec_command("pwd")
+        self.remote_client.exec_command(
+            "mkdir -p {}/tmp".format(home_path))
+        temporary_database_filepath = home_path + "/tmp/wordpress.sql"
+        self.remote_client.exec_command(
+            "cd wordpress && vendor/bin/wp db export {}".format(temporary_database_filepath))
+        self.remote_client.download_file(temporary_database_filepath, filepath)
+        self.remote_client.exec_command(
+            "rm {}".format(temporary_database_filepath))
 
     def download_site_files(self, dirpath):
-        filenames = ls(self.remote_client, "wordpress/web/app/uploads")
-        for filename in filenames:
+        uploads_path = "web/app/uploads"
+        os.makedirs(os.path.join(dirpath, uploads_path), exist_ok=True)
+        for filename in ls(self.remote_client, "wordpress/" + uploads_path):
             if filename != "cache":
-                remote_path = "wordpress/web/app/uploads/" + filename
-                local_path = os.path.join(dirpath, filename)
+                remote_path = "wordpress/" + uploads_path + "/" + filename
+                local_path = os.path.join(dirpath, uploads_path, filename)
                 self.remote_client.download_file(remote_path, local_path)
