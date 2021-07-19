@@ -20,7 +20,7 @@ class RemoteClient:
     def get_ssh_client(self):
         ssh_client = SSHClient()
         ssh_client.set_missing_host_key_policy(AutoAddPolicy())
-        ssh_client.connect(self.site["host"],
+        ssh_client.connect(self.site["hostname"],
                            username=self.site["user"],
                            port=self.site["port"],
                            key_filename=self.config["key_filename"])
@@ -34,4 +34,8 @@ class RemoteClient:
         ssh_client.close()
         if error:
             raise RemoteCommandError(error)
-        return stdout.read().decode('utf8')
+        return stdout.read().decode('utf8').strip()
+
+    def download_file(self, src, dest):
+        scp_client = self.get_scp_client()
+        scp_client.get(src, dest, recursive=True)
