@@ -11,6 +11,6 @@ def exists(client, path):
     return True
 
 
-def ls(client, path):
+def ls(client, dirpath):
     return client.exec_command(
-        "ls wordpress/web/app/uploads").split("\n")
+        "ls {}".format(dirpath)).split("\n")
