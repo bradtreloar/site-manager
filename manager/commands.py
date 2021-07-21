@@ -1,4 +1,5 @@
 
+from manager.notifications.mail import Mailer, Renderer
 from manager.uptime import test_https_response
 
 
@@ -10,6 +11,8 @@ class CommandBase:
         for host, site in config["sites"].items():
             site["host"] = host
             self.sites.append(site)
+        self.mailer = Mailer(config["mail"])
+        self.renderer = Renderer()
 
 
 class Commands:
@@ -30,8 +33,8 @@ class Commands:
                 print("{:<24}{}".format(command.__name__, command.__doc__))
             print()
 
-    class test_website_response(CommandBase):
-        """Tests that each website responds."""
+    class monitor_uptime(CommandBase):
+        """Monitors website uptime and alerts sysadmin when websites are offline."""
 
         def execute(self):
             for site in self.sites:
