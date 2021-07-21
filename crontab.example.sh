@@ -3,9 +3,9 @@ SHELL=/bin/bash
 APP_ROOT=/app
 RUN="/usr/bin/python3 $APP_ROOT/run.py"
 
-# Run uptime monitor every five minutes
-*/5 * * * *      $RUN https_uptime_monitor
-*/5 * * * *      $RUN smtp_uptime_monitor
+# Run status monitor every five minutes
+*/5 * * * *      $RUN update_https_status
+*/5 * * * *      $RUN update_ssh_status
 
 # Backup websites every Sunday
 00 09 * * sun    $RUN backup_wordpress
