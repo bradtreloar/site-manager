@@ -9,18 +9,31 @@ from manager.database import Model
 def import_sites(sites, db_session):
     for site_host, site_config in sites.items():
         site_config["host"] = site_host
-        if "ssh_hostname" not in site_config.keys():
-            site_config["ssh_hostname"] = site_host
-        if "ssh_port" not in site_config.keys():
-            site_config["ssh_port"] = 22
+        site_attributes = {
+            "host": site_host,
+            "ssh_hostname": site_host,
+            "ssh_port": 22,
+        }
+        if "app" in site_config.keys():
+            site_attributes["app"] = site_config["app"]
+        if "ssh" in site_config.keys():
+            site_ssh_config = site_config["ssh"]
+            if "hostname" in site_ssh_config.keys():
+                site_attributes["ssh_hostname"] = site_ssh_config["hostname"]
+            if "port" in site_ssh_config.keys():
+                site_attributes["ssh_port"] = site_ssh_config["port"]
+            if "user" in site_ssh_config.keys():
+                site_attributes["ssh_user"] = site_ssh_config["user"]
+            if "key" in site_ssh_config.keys():
+                site_attributes["ssh_key_filename"] = site_ssh_config["key"]
         site = db_session.query(Site).filter(
             Site.host == site_host).scalar()
         if not site:
-            site = Site(**site_config)
+            site = Site(**site_attributes)
             db_session.add(site)
             print("created", site)
         else:
-            for key, value in site_config.items():
+            for key, value in site_attributes.items():
                 setattr(site, key, value)
             print("updated", site)
         db_session.commit()
