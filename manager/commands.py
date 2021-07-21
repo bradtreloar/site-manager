@@ -2,7 +2,7 @@
 from manager.uptime import test_https_response
 
 
-class BaseCommand:
+class CommandBase:
 
     def __init__(self, config):
         self.config = config
@@ -14,7 +14,7 @@ class BaseCommand:
 
 class Commands:
 
-    class help(BaseCommand):
+    class help(CommandBase):
         """Displays help text."""
 
         def execute(self):
@@ -24,13 +24,13 @@ class Commands:
             commands = []
             for attr_name in dir(Commands):
                 attr = getattr(Commands, attr_name)
-                if type(attr).__name__ == "type" and attr.__base__.__name__ == "BaseCommand":
+                if type(attr).__name__ == "type" and attr.__base__.__name__ == "CommandBase":
                     commands.append(attr)
             for command in commands:
                 print("{:<24}{}".format(command.__name__, command.__doc__))
             print()
 
-    class test_website_response(BaseCommand):
+    class test_website_response(CommandBase):
         """Tests that each website responds."""
 
         def execute(self):
