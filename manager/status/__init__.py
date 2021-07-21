@@ -3,12 +3,16 @@ from datetime import datetime
 import requests
 
 
-def test_https_response(site):
+def check_https_status(site):
     start_at = datetime.now()
-    response = requests.get("https://" + site["host"])
+    url = "https://" + site.host
+    response = requests.get(url)
     end_at = datetime.now()
     duration = end_at - start_at
     return {
+        "site": site,
+        "url": url,
+        "request_time": start_at,
         "status_code": response.status_code,
         "duration": duration.total_seconds()
     }
