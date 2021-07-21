@@ -1,8 +1,12 @@
 
+import inspect
+from jinja2 import Environment, FunctionLoader, select_autoescape
+import os
 import smtplib
 import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import manager
 
 
 class Mailer:
@@ -35,3 +39,26 @@ class Mailer:
                 smtp.sendmail(
                     self.mail_from, self.mail_to, message.as_string()
                 )
+
+
+class Renderer:
+
+    def __init__(self):
+        self.env = Environment(
+            loader=FunctionLoader(self.load_template),
+            autoescape=select_autoescape()
+        )
+
+    def load_template(self, template_name):
+        path_components = template_name.split(".")
+        path_components.insert(1, "templates")
+        template_path = os.path.join(*path_components)
+        template_path = os.path.join(manager.__path__[0], template_path)
+        template_path += ".html"
+        with open(template_path) as template_file:
+            return template_file.read()
+
+    def render(self, template_name, data):
+        template = self.env.get_template(template_name)
+        output = template.render(**data)
+        return output
