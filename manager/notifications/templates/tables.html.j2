@@ -1,0 +1,14 @@
+{% macro details_table(rows) -%}
+<table style="border-collapse:collapse;border-bottom:dotted 1px grey;width:100%;">
+    {% for label, value in rows %}
+    <tr style="border-top:dotted 1px grey;">
+        <th style="padding:0.5em 1em 0.5em 0;text-align:left;white-space:nowrap;">
+            {{ label }}
+        </th>
+        <td style="padding:0.5em 0;text-align:left;width:100%;">
+            {{ value }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{%- endmacro %}
