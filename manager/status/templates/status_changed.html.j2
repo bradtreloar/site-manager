@@ -1,0 +1,11 @@
+{% extends "layout" %}
+{% import "tables" as tables %}
+{% block title %}
+    {{ site.host }} is 
+    <span style="padding:0.25em 0.5em;background-color:{{ status_color }};color:white;text-transform:uppercase">
+        {{ status_value }}
+    </span>
+{% endblock %}
+{% block content %}
+{{ tables.details_table(status_details) }}
+{% endblock %}

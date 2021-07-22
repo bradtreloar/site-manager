@@ -1,16 +1,22 @@
 
+from datetime import datetime
+from multiprocessing.pool import ThreadPool
+from termcolor import colored
+
+from manager.status.models import SiteStatus, StatusLogType
+from manager.database import session
 from manager.notifications.mail import Mailer, Renderer
-from manager.uptime import test_https_response
+from manager.status import check_https_status
+from manager.status.models import StatusLogEntry
+from manager.sites import Site, import_sites
 
 
 class CommandBase:
 
     def __init__(self, config):
         self.config = config
-        self.sites = []
-        for host, site in config["sites"].items():
-            site["host"] = host
-            self.sites.append(site)
+        self.db_session = session(config["database"])
+        import_sites(config["sites"], self.db_session)
         self.mailer = Mailer(config["mail"])
         self.renderer = Renderer()
 
@@ -33,15 +39,74 @@ class Commands:
                 print("{:<24}{}".format(command.__name__, command.__doc__))
             print()
 
-    class monitor_uptime(CommandBase):
-        """Monitors website uptime and alerts sysadmin when websites are offline."""
+    class update_https_status(CommandBase):
+        """Checks status of each website and notifies sysadmin when a website is down or inaccessible."""
 
         def execute(self):
-            for site in self.sites:
-                result = test_https_response(site)
-                print(site["host"])
-                print("  status_code: {}".format(result["status_code"]))
-                print("  duration: {}".format(result["duration"]))
+            sites = self.db_session.query(Site).filter(
+                Site.is_active
+            ).all()
+            sites_info = [{
+                "site_id": site.id,
+                "site_url": "https://" + site.host,
+                "site_last_status": site.last_status,
+            } for site in sites]
+            results = ThreadPool().imap_unordered(
+                check_https_status, sites_info)
+            for result in results:
+                site = self.db_session.query(Site).get(result["site_id"])
+                result["site"] = site
+                if result["status_changed"]:
+                    status_log_entry = StatusLogEntry(
+                        site=site,
+                        type=StatusLogType.HTTPS,
+                        status=result["status"],
+                        created=datetime.now(),
+                    )
+                    self.db_session.add(status_log_entry)
+                    if result["notify"]:
+                        self.notify_status_change(result)
+            self.db_session.commit()
+
+        def notify_status_change(self, result):
+            status_colors = {"up": "green", "down": "red", "unknown": "orange"}
+            data = {
+                "site": result["site"],
+                "status_value": result["status"].value,
+                "status_color": status_colors[result["status"].value],
+                "status_details": [
+                    ("URL",
+                     '<a href="{0}">{0}</a>'.format(result["site_url"])),
+                    ("Request time", result["request_time"]),
+                ]
+            }
+            if "error" in result.keys():
+                data["status_details"].append(("Error", result["error"]))
+            message_subject = "{status}: {host}".format(
+                status=result["status"].value.upper(),
+                host=result["site"].host,
+            )
+            message_body = self.renderer.render("status.status_changed", data)
+            self.mailer.notify(message_subject, message_body)
+
+    class show_https_status(CommandBase):
+        """Displays most recent status of each website."""
+
+        def execute(self):
+            sites = self.db_session.query(Site).filter(
+                Site.is_active
+            ).all()
+            status_colors = {
+                SiteStatus.UP: ("green", ),
+                SiteStatus.DOWN: ("white", "on_red"),
+                SiteStatus.UNKNOWN: ("yellow", ),
+            }
+            print()
+            for site in sites:
+                status = site.last_status
+                print("{0:.<40} ".format(site.host) +
+                      colored(" {} ".format(status.value.upper()), *status_colors[status]))
+            print()
 
 
 class CommandError(BaseException):
