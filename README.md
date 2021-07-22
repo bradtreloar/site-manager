@@ -1,5 +1,17 @@
 # Site Manager
 
+## Configuration
+
+### Sites
+
+```yaml
+# config.yml
+
+sites:
+  # Minimal site config.
+  example.com: {}
+```
+
 ## Uptime monitor
 
 Monitor site availability.
