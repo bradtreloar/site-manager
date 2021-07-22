@@ -2,14 +2,14 @@
 
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import Integer, String
+from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 
 from manager.database import Model
 
 
-def import_sites(sites, db_session):
+def import_sites(site_configs, db_session):
     """Adds or updates each site from the config in the database."""
-    for site_host, site_config in sites.items():
+    for site_host, site_config in site_configs.items():
         site_config["host"] = site_host
         site_attributes = {
             "host": site_host,
@@ -35,6 +35,14 @@ def import_sites(sites, db_session):
                 for key, value in ssh_config_attributes.items():
                     setattr(site.ssh_config, key, value)
         db_session.commit()
+    sites = db_session.query(Site).all()
+    for site in sites:
+        try:
+            site_configs[site.host]
+            site.is_active = True
+        except KeyError:
+            site.is_active = False
+    db_session.commit()
 
 
 class Site(Model):
@@ -43,6 +51,7 @@ class Site(Model):
     id = Column(Integer, primary_key=True)
     host = Column(String(255), unique=True, nullable=False)
     app = Column(String(255))
+    is_active = Column(Boolean, default=True, nullable=False)
 
     def __repr__(self):
         return "<Site(site='{}')>".format(
