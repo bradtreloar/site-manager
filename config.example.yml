@@ -1,0 +1,32 @@
+sites:
+  example1.com:
+    ssh:
+      host: ssh.example.com
+      port: 21212
+      user: exampleuser
+    app: wordpress
+  example2.com: {}
+
+database:
+  engine: sqlite
+  path: ./tmp/sqlite.db
+
+aws:
+  region: us-east-1
+  aws_access_key_id: xxxxxxxxxxxxxxxxxxxx
+  aws_secret_access_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+mail:
+  to: brad@treloardigital.com.au
+  from: sitemanager@treloardigital.com.au
+  host: smtp.mailtrap.io
+  port: 2525
+  username: xxxxxxxxxxxxxx
+  password: xxxxxxxxxxxxxx
+  use_tls: False
+
+webauth:
+  login_url: "https://webauth.example.com"
+  webauth_url: "https://webauth.example.com/webauth_operation.php"
+  username: xxxxxxxxxxxxxx
+  password: xxxxxxxxxxxxxx
