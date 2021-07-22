@@ -1,6 +1,6 @@
 
 from datetime import datetime
-from manager.status.models import SiteStatus, last_status
+from manager.status.models import SiteStatus, latest_status
 import requests
 from requests.exceptions import ConnectionError
 
@@ -8,7 +8,7 @@ from requests.exceptions import ConnectionError
 def check_https_status(site_info):
     start_at = datetime.now()
     url = site_info["site_url"]
-    last_status = site_info["site_last_status"]
+    latest_status = site_info["site_latest_status"]
     result = {
         **site_info,
         "request_time": start_at,
@@ -26,7 +26,7 @@ def check_https_status(site_info):
     except ConnectionError as ex:
         result["status"] = SiteStatus.DOWN
         result["error"] = "Connection error."
-    result["status_changed"] = result["status"] != last_status
-    result["notify"] = [last_status, result["status"]] != [
+    result["status_changed"] = result["status"] != latest_status
+    result["notify"] = [latest_status, result["status"]] != [
         SiteStatus.UNKNOWN, SiteStatus.UP]
     return result

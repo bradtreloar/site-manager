@@ -49,7 +49,7 @@ class Commands:
             sites_info = [{
                 "site_id": site.id,
                 "site_url": "https://" + site.host,
-                "site_last_status": site.last_status,
+                "site_latest_status": site.latest_status,
             } for site in sites]
             results = ThreadPool().imap_unordered(
                 check_https_status, sites_info)
@@ -97,15 +97,23 @@ class Commands:
                 Site.is_active
             ).all()
             status_colors = {
-                SiteStatus.UP: ("green", ),
+                SiteStatus.UP: ("grey", "on_green"),
                 SiteStatus.DOWN: ("white", "on_red"),
-                SiteStatus.UNKNOWN: ("yellow", ),
+                SiteStatus.UNKNOWN: ("grey", "on_yellow"),
             }
             print()
             for site in sites:
-                status = site.last_status
-                print("{0:.<40} ".format(site.host + " ") +
-                      colored(" {} ".format(status.value.upper()), *status_colors[status]))
+                status = site.latest_status
+                try:
+                    status_age = (datetime.now() -
+                                  site.latest_status_log_entry.created)
+                except AttributeError:
+                    status_age = ""
+                print("{0:.<40} {1} for {2}".format(
+                    site.host,
+                    colored(" {} ".format(
+                        status.value.upper()), *status_colors[status]),
+                    status_age))
             print()
 
 

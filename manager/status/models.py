@@ -52,9 +52,9 @@ Site.latest_status_log_entry = latest_status_log_entry
 
 
 @property
-def last_status(site):
+def latest_status(site):
     entry = site.latest_status_log_entry
     return entry.status if entry else SiteStatus.UNKNOWN
 
 
-Site.last_status = last_status
+Site.latest_status = latest_status
