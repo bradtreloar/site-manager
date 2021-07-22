@@ -104,7 +104,7 @@ class Commands:
             print()
             for site in sites:
                 status = site.last_status
-                print("{0:.<40} ".format(site.host) +
+                print("{0:.<40} ".format(site.host + " ") +
                       colored(" {} ".format(status.value.upper()), *status_colors[status]))
             print()
 
