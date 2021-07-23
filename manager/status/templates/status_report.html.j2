@@ -1,0 +1,34 @@
+{% extends "layout" %}
+{% block title %}
+    Status report
+{% endblock %}
+{% block content %}
+<table style="border-collapse:collapse;border-bottom:dotted 1px grey;width:100%;">
+    <tr style="border-top:dotted 1px grey;">
+        <th style="padding:0.5em 1em 0.5em 0;text-align:left;white-space:nowrap;width:100%;">
+            Site
+        </th>
+        <th style="padding:0.5em 1em 0.5em 0;text-align:center;white-space:nowrap;">
+            Status
+        </th>
+        <th style="padding:0.5em 1em 0.5em 0;text-align:right;white-space:nowrap;">
+            Duration
+        </th>
+    </tr>
+    {% for row in table_rows %}
+    <tr style="border-top:dotted 1px grey;">
+        <td style="padding:0.5em 1em 0.5em 0;text-align:left;white-space:nowrap;">
+            {{ row.site_host }}
+        </td>
+        <td style="padding:0.5em 1em 0.5em 0;text-align:center;white-space:nowrap;">
+            <span style="padding:0.25em 0.5em;color:{{ row.status_color[0] }};background-color:{{ row.status_color[1] }};color:white;text-transform:uppercase">
+                {{ row.status_value }}
+            </span>
+        </td>
+        <td style="padding:0.5em 1em 0.5em 0;text-align:right;white-space:nowrap;">
+            {{ row.status_duration }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -3,11 +3,10 @@ from datetime import datetime
 from multiprocessing.pool import ThreadPool
 from termcolor import colored
 
-from manager.status.models import SiteStatus, StatusLogType
 from manager.database import session
 from manager.notifications.mail import Mailer, Renderer
 from manager.status import check_https_status
-from manager.status.models import StatusLogEntry
+from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
 from manager.sites import Site, import_sites
 
 
@@ -115,6 +114,34 @@ class Commands:
                         status.value.upper()), *status_colors[status]),
                     status_age))
             print()
+
+    class send_status_report(CommandBase):
+        """Sends email report listing website status details."""
+
+        def execute(self):
+            sites = self.db_session.query(Site).filter(
+                Site.is_active
+            ).all()
+            status_colors = {
+                SiteStatus.UP: ("white", "green"),
+                SiteStatus.DOWN: ("white", "red"),
+                SiteStatus.UNKNOWN: ("black", "yellow"),
+            }
+
+            def table_rows():
+                for site in sites:
+                    entry = site.latest_status_log_entry
+                    yield {
+                        "site_host": site.host,
+                        "status_value": entry.status.value,
+                        "status_color": status_colors[entry.status],
+                        "status_duration": datetime.now() - entry.created,
+                    }
+
+            message_body = self.renderer.render("status.status_report", {
+                "table_rows": list(table_rows()),
+            })
+            self.mailer.notify("Status report", message_body)
 
 
 class CommandError(BaseException):
