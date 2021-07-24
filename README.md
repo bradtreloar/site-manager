@@ -28,7 +28,7 @@ python3 run.py update_https_status
 
 ## Wordpress and Drupal website Backups
 
-Backup Drupal and Wordpress websites to Amazon S3. The S3 bucket name
+Backup Drupal and Wordpress websites to Amazon S3. The S3 bucket name is derived from the hostname (`sitebackup-example.com`) and the bucket is created if it doesn't exist.
 
 ```bash
 # Backup Wordpress sites.
