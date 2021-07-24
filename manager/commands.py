@@ -164,8 +164,8 @@ class Commands:
                     "ssh_config": site.ssh_config.to_dict(),
                 }, self.config["aws"])
 
-            Pool().map(backup_wordpress_site, [
-                task_args(site) for site in sites])
+            for site in sites:
+                backup_wordpress_site(task_args(site))
 
     class backup_drupal(CommandBase):
         """Backs up Drupal websites to Amazon S3"""
@@ -184,8 +184,8 @@ class Commands:
                     "ssh_config": site.ssh_config.to_dict(),
                 }, self.config["aws"])
 
-            Pool().map(backup_drupal_site, [
-                task_args(site) for site in sites])
+            for site in sites:
+                backup_drupal_site(task_args(site))
 
 
 class CommandError(BaseException):
