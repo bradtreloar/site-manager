@@ -5,3 +5,4 @@ __pycache__/
 tmp/
 /config.yml
 /config.prod.yml
+test.py
