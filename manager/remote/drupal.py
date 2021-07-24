@@ -23,7 +23,7 @@ class DrupalClient:
             "cd drupal && vendor/bin/drupal site:status")
         return status.split('\n')[1].strip().split(" ")[-1]
 
-    def sites_settings(self):
+    def site_names(self):
         sites_filepath = "drupal/web/sites/sites.php"
         if not exists(self.remote_client, sites_filepath):
             return ['default']
@@ -37,8 +37,11 @@ class DrupalClient:
                 site_name = matches[1]
                 if site_name not in site_names:
                     site_names.append(site_name)
+        return site_names
+
+    def sites_settings(self):
         sites_settings = {}
-        for site_name in site_names:
+        for site_name in self.site_names():
             sites_settings[site_name] = self.site_settings(site_name)
         return sites_settings
 
@@ -71,7 +74,7 @@ class DrupalClient:
             settings["database"][matches[1]] = matches[2]
         return settings
 
-    def export_database(self, site_name, site_info, dirpath):
+    def export_database(self, site_name, site_settings, dirpath):
         filepath = dirpath + "/data/{}/drupal.sql".format(site_name)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         home_path = self.remote_client.exec_command("pwd")
@@ -79,7 +82,7 @@ class DrupalClient:
             "mkdir -p {}/tmp".format(home_path))
         temporary_database_filepath = "{}/tmp/drupal_{}.sql".format(
             home_path, site_name)
-        database_settings = site_info["database"]
+        database_settings = site_settings["database"]
         command = "MYSQL_PWD='{password}' mysqldump --user='{username}' '{database}' > {file}".format(
             database=database_settings["database"],
             username=database_settings["username"],
