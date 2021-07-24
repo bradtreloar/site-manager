@@ -50,10 +50,10 @@ def backup_drupal_site(args):
         site_info["ssh_config"], site_info["backup_bucket"])
     client.start_webauth_session()
     # Get site names
-    site_names = client.site_names()
+    sites_settings = client.sites_settings()
     # Download backups.
-    for site_name in site_names:
-        client.export_database(site_name, temp_dir)
+    for site_name, site_settings in sites_settings.items():
+        client.export_database(site_name, site_settings, temp_dir)
         client.download_site_files(site_name, temp_dir)
     # Create backup tarball.
     archive_dirpath = "/tmp/archives/{}".format(site_info["site_host"])

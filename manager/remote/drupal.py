@@ -23,7 +23,7 @@ class DrupalClient:
             "cd drupal && vendor/bin/drupal site:status")
         return status.split('\n')[1].strip().split(" ")[-1]
 
-    def site_names(self):
+    def sites_settings(self):
         sites_filepath = "drupal/web/sites/sites.php"
         if not exists(self.remote_client, sites_filepath):
             return ['default']
@@ -37,18 +37,56 @@ class DrupalClient:
                 site_name = matches[1]
                 if site_name not in site_names:
                     site_names.append(site_name)
-        return site_names
+        sites_settings = {}
+        for site_name in site_names:
+            sites_settings[site_name] = self.site_settings(site_name)
+        return sites_settings
 
-    def export_database(self, site_name, dirpath):
+    def site_settings(self, site_name):
+        settings_file_contents = self.remote_client.exec_command(
+            "cat drupal/web/sites/{}/settings.php".format(site_name))
+        lines = settings_file_contents.split("\n")
+        line_count = len(lines)
+        line_number = 0
+        # Move to the start of the database settings
+        settings = {
+            "database": {}
+        }
+        # Seek to database settings.
+        while line_number < line_count:
+            line = lines[line_number]
+            line_number += 1
+            pattern = r"""^\$databases\[['"]{1}default['"]{1}\]\[['"]{1}default['"]{1}\]"""
+            matches = re.search(pattern, line.strip())
+            if matches:
+                break
+        # Read database settings.
+        while line_number < line_count:
+            line = lines[line_number]
+            line_number += 1
+            pattern = r"""['"]{1}([a-z]{1,})['"]{1}\s{0,}=>\s{0,}['"]{1}([^'"]{0,})['"]{1},"""
+            matches = re.search(pattern, line.strip())
+            if not matches:
+                break
+            settings["database"][matches[1]] = matches[2]
+        return settings
+
+    def export_database(self, site_name, site_info, dirpath):
         filepath = dirpath + "/data/{}/drupal.sql".format(site_name)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         home_path = self.remote_client.exec_command("pwd")
         self.remote_client.exec_command(
             "mkdir -p {}/tmp".format(home_path))
-        temporary_database_filepath = home_path + "/tmp/drupal.sql"
-        alias = "@self" if site_name == "default" else "@" + site_name
-        self.remote_client.exec_command(
-            "cd drupal && vendor/bin/drupal database:dump --no-interaction --quiet --file {}".format(temporary_database_filepath))
+        temporary_database_filepath = "{}/tmp/drupal_{}.sql".format(
+            home_path, site_name)
+        database_settings = site_info["database"]
+        command = "MYSQL_PWD='{password}' mysqldump --user='{username}' '{database}' > {file}".format(
+            database=database_settings["database"],
+            username=database_settings["username"],
+            password=database_settings["password"],
+            file=temporary_database_filepath
+        )
+        self.remote_client.exec_command(command)
         self.remote_client.download_file(temporary_database_filepath, filepath)
         self.remote_client.exec_command(
             "rm {}".format(temporary_database_filepath))
