@@ -1,13 +1,14 @@
 
 from datetime import datetime
-from multiprocessing.pool import ThreadPool
+from manager.backup import backup_drupal_site, backup_wordpress_site
+from multiprocessing import Pool
 from termcolor import colored
 
 from manager.database import session
 from manager.notifications.mail import Mailer, Renderer
 from manager.status import check_https_status
 from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
-from manager.sites import Site, import_sites
+from manager.sites import Site, SiteSSHConfig, import_sites
 
 
 class CommandBase:
@@ -15,7 +16,7 @@ class CommandBase:
     def __init__(self, config):
         self.config = config
         self.db_session = session(config["database"])
-        import_sites(config["sites"], self.db_session)
+        import_sites(config, self.db_session)
         self.mailer = Mailer(config["mail"])
         self.renderer = Renderer()
 
@@ -45,13 +46,16 @@ class Commands:
             sites = self.db_session.query(Site).filter(
                 Site.is_active
             ).all()
-            sites_info = [{
-                "site_id": site.id,
-                "site_url": "https://" + site.host,
-                "site_latest_status": site.latest_status,
-            } for site in sites]
-            results = ThreadPool().imap_unordered(
-                check_https_status, sites_info)
+
+            def task_args(site):
+                return {
+                    "site_id": site.id,
+                    "site_url": "https://" + site.host,
+                    "site_latest_status": site.latest_status,
+                }
+
+            results = Pool().imap_unordered(
+                check_https_status, [task_args(site) for site in sites])
             for result in results:
                 site = self.db_session.query(Site).get(result["site_id"])
                 result["site"] = site
@@ -142,6 +146,46 @@ class Commands:
                 "table_rows": list(table_rows()),
             })
             self.mailer.notify("Status report", message_body)
+
+    class backup_wordpress(CommandBase):
+        """Backs up Wordpress websites to Amazon S3"""
+
+        def execute(self):
+            sites = self.db_session.query(Site).join(SiteSSHConfig).filter(
+                Site.is_active,
+                Site.app == "wordpress"
+            ).all()
+
+            def task_args(site):
+                return ({
+                    "site_id": site.id,
+                    "site_host": site.host,
+                    "backup_bucket": "sitebackup-" + site.host,
+                    "ssh_config": site.ssh_config.to_dict(),
+                }, self.config["aws"])
+
+            Pool().map(backup_wordpress_site, [
+                task_args(site) for site in sites])
+
+    class backup_drupal(CommandBase):
+        """Backs up Drupal websites to Amazon S3"""
+
+        def execute(self):
+            sites = self.db_session.query(Site).join(SiteSSHConfig).filter(
+                Site.is_active,
+                Site.app == "drupal"
+            ).all()
+
+            def task_args(site):
+                return ({
+                    "site_id": site.id,
+                    "site_host": site.host,
+                    "backup_bucket": "sitebackup-" + site.host,
+                    "ssh_config": site.ssh_config.to_dict(),
+                }, self.config["aws"])
+
+            Pool().map(backup_drupal_site, [
+                task_args(site) for site in sites])
 
 
 class CommandError(BaseException):

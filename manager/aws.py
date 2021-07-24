@@ -5,13 +5,12 @@ import boto3
 
 class S3BackupBucketClient:
 
-    def __init__(self, config, site):
-        self.site = site
+    def __init__(self, config, backup_bucket):
         self.region = config["region"]
         s3 = boto3.resource('s3',
                             aws_access_key_id=config["aws_access_key_id"],
                             aws_secret_access_key=config["aws_secret_access_key"])
-        self.bucket = s3.Bucket("sitebackup-" + site["host"])
+        self.bucket = s3.Bucket(backup_bucket)
 
     def exists(self):
         return self.bucket.creation_date is not None

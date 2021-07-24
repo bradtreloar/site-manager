@@ -1,5 +1,5 @@
 
-
+import json
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, Integer, String
@@ -7,9 +7,9 @@ from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 from manager.database import Model
 
 
-def import_sites(site_configs, db_session):
+def import_sites(config, db_session):
     """Adds or updates each site from the config in the database."""
-    for site_host, site_config in site_configs.items():
+    for site_host, site_config in config["sites"].items():
         site_config["host"] = site_host
         site_attributes = {
             "host": site_host,
@@ -29,6 +29,10 @@ def import_sites(site_configs, db_session):
             ssh_config_attributes = site_config["ssh"]
             if "host" not in ssh_config_attributes.keys():
                 ssh_config_attributes["host"] = site_host
+            ssh_host = ssh_config_attributes["host"]
+            if ssh_host in config["webauth"].keys():
+                ssh_config_attributes["webauth"] = json.dumps(
+                    config["webauth"][ssh_host])
             if not site.ssh_config:
                 site.ssh_config = SiteSSHConfig(**ssh_config_attributes)
             else:
@@ -38,7 +42,7 @@ def import_sites(site_configs, db_session):
     sites = db_session.query(Site).all()
     for site in sites:
         try:
-            site_configs[site.host]
+            config["sites"][site.host]
             site.is_active = True
         except KeyError:
             site.is_active = False
@@ -68,12 +72,22 @@ class SiteSSHConfig(Model):
     port = Column(Integer, default=22, nullable=False)
     user = Column(String(255), nullable=False)
     key_filename = Column(String(1023))
+    webauth = Column(String(4095))
 
     site = relationship(Site, back_populates="ssh_config")
 
     def __repr__(self):
         return "<SiteSSHConfig(site='{}')>".format(
             self.site.host)
+
+    def to_dict(self):
+        return {
+            "host": self.host,
+            "port": self.port,
+            "user": self.user,
+            "key_filename": self.key_filename,
+            "webauth": json.loads(self.webauth) if self.webauth else None
+        }
 
 
 Site.ssh_config = relationship(SiteSSHConfig,

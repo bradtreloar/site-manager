@@ -7,9 +7,9 @@ from manager.remote.filesystem import exists, ls
 
 class WordpressClient:
 
-    def __init__(self, config, site):
-        self.remote_client = RemoteClient(config["ssh"], site)
-        self.site = site
+    def __init__(self, ssh_config, backup_bucket):
+        self.remote_client = RemoteClient(ssh_config)
+        self.backup_bucket = backup_bucket
 
     def exists(self):
         return exists(self.remote_client, "wordpress")
@@ -38,3 +38,6 @@ class WordpressClient:
                 remote_path = "wordpress/" + uploads_path + "/" + filename
                 local_path = os.path.join(dirpath, uploads_path, filename)
                 self.remote_client.download_file(remote_path, local_path)
+
+    def start_webauth_session(self):
+        self.remote_client.start_webauth_session()

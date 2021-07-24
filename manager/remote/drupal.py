@@ -1,18 +1,19 @@
 
 
 import os
+import re
 import shutil
 from manager.remote.client import RemoteClient
 from manager.remote.filesystem import exists, ls
 
-IGNORED_FILES = ["php", "css", "js"]
+IGNORED_FILES = ["php", "css", "js", "styles", "simpletest"]
 
 
 class DrupalClient:
 
-    def __init__(self, config, site):
-        self.remote_client = RemoteClient(config["ssh"], site)
-        self.site = site
+    def __init__(self, ssh_config, backup_bucket):
+        self.remote_client = RemoteClient(ssh_config)
+        self.backup_bucket = backup_bucket
 
     def exists(self):
         return exists(self.remote_client, "drupal")
@@ -42,3 +43,6 @@ class DrupalClient:
                 remote_path = "drupal/" + files_path + "/" + filename
                 local_path = os.path.join(dirpath, files_path, filename)
                 self.remote_client.download_file(remote_path, local_path)
+
+    def start_webauth_session(self):
+        self.remote_client.start_webauth_session()
