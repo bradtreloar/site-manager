@@ -1,5 +1,7 @@
 
 
+from dotenv import dotenv_values
+from io import StringIO
 import os
 from manager.remote.client import RemoteClient
 from manager.remote.filesystem import exists, ls
@@ -18,14 +20,34 @@ class WordpressClient:
         return self.remote_client.exec_command(
             "cd wordpress && vendor/bin/wp core version")
 
+    def site_settings(self):
+        dotenv = self.remote_client.exec_command("cat wordpress/.env")
+        settings = dotenv_values(stream=StringIO(dotenv))
+        return {
+            "database": {
+                "host": settings.get("DB_HOST", "localhost"),
+                "port": settings.get("DB_PORT", "3306"),
+                "database": settings["DB_NAME"],
+                "username": settings["DB_USER"],
+                "password": settings["DB_PASSWORD"],
+            }
+        }
+
     def export_database(self, filepath):
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         home_path = self.remote_client.exec_command("pwd")
         self.remote_client.exec_command(
             "mkdir -p {}/tmp".format(home_path))
         temporary_database_filepath = home_path + "/tmp/wordpress.sql"
-        self.remote_client.exec_command(
-            "cd wordpress && vendor/bin/wp db export {}".format(temporary_database_filepath))
+        site_settings = self.site_settings()
+        database_settings = site_settings["database"]
+        command = "MYSQL_PWD='{password}' mysqldump --user='{username}' '{database}' > {file}".format(
+            database=database_settings["database"],
+            username=database_settings["username"],
+            password=database_settings["password"],
+            file=temporary_database_filepath
+        )
+        self.remote_client.exec_command(command)
         self.remote_client.download_file(temporary_database_filepath, filepath)
         self.remote_client.exec_command(
             "rm {}".format(temporary_database_filepath))
