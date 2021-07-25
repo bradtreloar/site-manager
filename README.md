@@ -2,7 +2,7 @@
 
 ## Configuration
 
-Copy `config.example.com` and replace examples with real values.
+Copy `config.example.yml` and replace examples with real values.
 
 ## Uptime monitor
 
