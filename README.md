@@ -40,6 +40,48 @@ python3 run.py backup_wordpress
 python3 run.py backup_drupal
 ```
 
+### Site requirements
+
+#### Wordpress
+
+This backup utility is designed to be used with Roots Bedrock Wordpress.
+- The site must be installed on the server at `~/wordpress`.
+- The database settings must be available in `~/wordpress/.env`, and should use the variable names used by Bedrock.
+- The uploads folder must be located at `~/wordpress/web/app/uploads`.
+
+.env variable names:
+
+| Variable name | Required | Description                                     |
+| :------------ | :------- | :---------------------------------------------- |
+| `DB_NAME`     | Required | The database name.                              |
+| `DB_USER`     | Required | The database username.                          |
+| `DB_PASSWORD` | Required | The database password.                          |
+| `DB_HOST`     | Optional | The database hostname. Defaults to `localhost`. |
+| `DB_PORT`     | Optional | The database port. Defaults to `3306`           |
+
+#### Drupal
+
+This backup utility is designed to be used with Drupal sites created using the same structure as `drupal-composer/drupal-project`.
+- The site must be installed on the server at `~/drupal` and the web root must be located at `~/drupal/web`.
+- The database settings must be available in `~/drupal/.env`, and should use the variable names listed below.
+- The sites folder must be located at `~/drupal/web/sites`.
+
+.env variable names:
+
+| Variable name    | Required | Description                                     |
+| :--------------- | :------- | :---------------------------------------------- |
+| `DEFAULT_DBNAME` | Required | The database name.                              |
+| `DEFAULT_DBUSER` | Required | The database username.                          |
+| `DEFAULT_DBPASS` | Required | The database password.                          |
+| `DEFAULT_DBHOST` | Optional | The database hostname. Defaults to `localhost`. |
+| `DEFAULT_DBPORT` | Optional | The database port. Defaults to `3306`.          |
+
+For multisite installations, replace `DEFAULT` with the site name, in all caps, and replace periods with underscores.
+
+Examples:
+- A site called `shop` in sites.php will use `SHOP_DBNAME`.
+- A site called 'shop.example.com' in sites.php will use `SHOP_EXAMPLE_COM_DBNAME`.
+
 ### Required config
 
 Each Wordpress and Drupal site config must include the `app` and `ssh` attributes, and you must provide credentials for AWS.
