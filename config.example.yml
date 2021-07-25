@@ -1,21 +1,42 @@
 sites:
-  example1.com:
-    ssh:
-      host: ssh.example.com
-      port: 21212
-      user: exampleuser
+  # The minimum required site configuration is the site's hostname as the key,
+  # and an empty map as a value.
+  example1.com: {}
+  # If the site is a Wordpress or Drupal site, and you want to create backups
+  # for these sites, then you need to provide the app name and the SSH config.
+  example2.com:
     app: wordpress
-  example2.com: {}
+    ssh:
+      user: example2user
+  # Here is a site with a more detailed SSH config, including optional values.
+  example3.com:
+    app: wordpress
+    ssh:
+      user: example3user
+      host: ssh.example3.com
+      port: 21212
+      key_filename: /path/to/key_filename
 
+# SQLite database config
+#
+# The path to the SQLite database file. SQLite is the only supported DB at this time.
 database:
-  engine: sqlite
   path: ./tmp/sqlite.db
 
+# AWS S3 config
+#
+# Region is used when creating buckets for site backups.
+# The access key must have the ability to create buckets and upload files to
+# existing buckets.
 aws:
   region: us-east-1
   aws_access_key_id: xxxxxxxxxxxxxxxxxxxx
   aws_secret_access_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+# SMTP config
+#
+# Used to send notifications. Currently notifications are only sent when a site
+# changes from UP to DOWN or vice versa.
 mail:
   to: brad@treloardigital.com.au
   from: sitemanager@treloardigital.com.au
@@ -25,6 +46,9 @@ mail:
   password: xxxxxxxxxxxxxx
   use_tls: False
 
+# Juniper Web Authentication config
+#
+# Used to start a web authentication session for an SSH server.
 webauth:
   login_url: "https://webauth.example.com"
   webauth_url: "https://webauth.example.com/webauth_operation.php"
