@@ -50,7 +50,9 @@ mail:
 #
 # Used to start a web authentication session for an SSH server.
 webauth:
-  login_url: "https://webauth.example.com"
-  webauth_url: "https://webauth.example.com/webauth_operation.php"
-  username: xxxxxxxxxxxxxx
-  password: xxxxxxxxxxxxxx
+  # This key must match the site's SSH host.
+  ssh.example3.com:
+    login_url: "https://webauth.example.com"
+    webauth_url: "https://webauth.example.com/webauth_operation.php"
+    username: xxxxxxxxxxxxxx
+    password: xxxxxxxxxxxxxx
