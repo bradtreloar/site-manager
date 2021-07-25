@@ -2,27 +2,7 @@
 
 ## Configuration
 
-Minimum required configuration in `config.yml`:
-
-```yaml
-# Minimal sites config.
-sites:
-  example.com: {}
-
-# SQLite database location.
-database:
-  path: /var/sqlite.db
-
-# SMTP settings for sending mail to a sysadmin.
-mail:
-  to: sysadmin@example.com
-  from: sitemanager@example.com
-  host: mail.example.com
-  port: 465
-  username: sitemanager@example.com
-  password: xxxxxxxxxxxxxxxxx
-  use_tls: True
-```
+Copy `config.example.com` and replace examples with real values.
 
 ## Uptime monitor
 
@@ -94,56 +74,8 @@ Examples:
 - A site called `shop` in sites.php will use `SHOP_DBNAME`.
 - A site called 'shop.example.com' in sites.php will use `SHOP_EXAMPLE_COM_DBNAME`.
 
-### Required config
+### Juniper firewall web authentication
 
-Each Wordpress and Drupal site config must include the `app` and `ssh` attributes, and you must provide credentials for AWS.
+If any of the SSH hosts require Juniper web authentication, you can provide the configuration and the site manager will attempt to start a web authentication session before attempting to connect via SSH.
 
-SSH settings:
-
-| Name     | Required | Description                                               |
-| :------- | :------- | :-------------------------------------------------------- |
-| user     | Required | the SSH username                                          |
-| port     | Optional | the SSH port. Defaults to port 22 if not given            |
-| hostname | Optional | the SSH host. The site's hostname will be used by default |
-
-Example:
-
-```yaml
-sites:
-  drupalexample.com:
-    app: drupal
-    ssh:
-      user: drupalexample
-  wordpressexample.com:
-    app: wordpress
-    ssh:
-      user: wordpressexample
-  # Example with more SSH settings
-  drupalexample2.com:
-    app: drupal
-    ssh:
-      host: example2.com
-      port: 21212
-      user: drupalexample2
-
-aws:
-  aws_access_key_id: xxxxxxxxxxxxxxxxxxx
-  aws_secret_access_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-### Optional config
-
-If any of the SSH hosts require Juniper web authentication, you can provide the configuration and the site manager will attempt to start a web authentication session.
-
-**This has only been tested on `webauth5.micron21.com`.**
-
-Example:
-
-```yaml
-webauth:
-  cp-kil-m-016.micron21.com:
-    login_url: "https://webauth5.micron21.com"
-    webauth_url: "https://webauth5.micron21.com/webauth_operation.php"
-    username: xxxxxxxxxxxxxxxxxx
-    password: xxxxxxxxxxxxxxxxxx
-```
+This has only been tested on `webauth5.micron21.com` and may not work for any other firewalls.
