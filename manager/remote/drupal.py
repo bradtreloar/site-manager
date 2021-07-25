@@ -1,5 +1,6 @@
 
-
+from dotenv import dotenv_values
+from io import StringIO
 import os
 import re
 import shutil
@@ -46,33 +47,18 @@ class DrupalClient:
         return sites_settings
 
     def site_settings(self, site_name):
-        settings_file_contents = self.remote_client.exec_command(
-            "cat drupal/web/sites/{}/settings.php".format(site_name))
-        lines = settings_file_contents.split("\n")
-        line_count = len(lines)
-        line_number = 0
-        # Move to the start of the database settings
-        settings = {
-            "database": {}
+        dotenv = self.remote_client.exec_command("cat drupal/.env")
+        settings = dotenv_values(stream=StringIO(dotenv))
+        prefix = site_name.upper().replace(".", "_")
+        return {
+            "database": {
+                "host": settings.get(prefix + "_DBHOST", "localhost"),
+                "port": settings.get(prefix + "_DBPORT", "3306"),
+                "database": settings[prefix + "_DBNAME"],
+                "username": settings[prefix + "_DBUSER"],
+                "password": settings[prefix + "_DBPASS"],
+            }
         }
-        # Seek to database settings.
-        while line_number < line_count:
-            line = lines[line_number]
-            line_number += 1
-            pattern = r"""^\$databases\[['"]{1}default['"]{1}\]\[['"]{1}default['"]{1}\]"""
-            matches = re.search(pattern, line.strip())
-            if matches:
-                break
-        # Read database settings.
-        while line_number < line_count:
-            line = lines[line_number]
-            line_number += 1
-            pattern = r"""['"]{1}([a-z]{1,})['"]{1}\s{0,}=>\s{0,}['"]{1}([^'"]{0,})['"]{1},"""
-            matches = re.search(pattern, line.strip())
-            if not matches:
-                break
-            settings["database"][matches[1]] = matches[2]
-        return settings
 
     def export_database(self, site_name, site_settings, dirpath):
         filepath = dirpath + "/data/{}/drupal.sql".format(site_name)
