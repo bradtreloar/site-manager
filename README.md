@@ -2,14 +2,26 @@
 
 ## Configuration
 
-### Sites
+Minimum required configuration in `config.yml`:
 
 ```yaml
-# config.yml
-
+# Minimal sites config.
 sites:
-  # Minimal site config.
   example.com: {}
+
+# SQLite database location.
+database:
+  path: /var/sqlite.db
+
+# SMTP settings for sending mail to a sysadmin.
+mail:
+  to: sysadmin@example.com
+  from: sitemanager@example.com
+  host: mail.example.com
+  port: 465
+  username: sitemanager@example.com
+  password: xxxxxxxxxxxxxxxxx
+  use_tls: True
 ```
 
 ## Uptime monitor
