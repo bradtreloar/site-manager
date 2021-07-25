@@ -15,8 +15,10 @@ Commands:
 python3 run.py update_https_status
 
 # Show statuses for all websites.
-python3 run.py update_https_status
+python3 run.py show_https_status
 ```
+
+The command `update_https_status` will send a notification when a site's status changes from `UP` or `UNKNOWN` to `DOWN` or when a site's status changes from `UP` to `DOWN`. The command tests the site's status by making an HTTPS request to the site's homepage.
 
 ## Wordpress and Drupal website Backups
 
