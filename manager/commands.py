@@ -1,7 +1,6 @@
 
 from datetime import datetime
 from manager.backup import backup_drupal_site, backup_wordpress_site
-from multiprocessing import Pool
 from termcolor import colored
 
 from manager.database import session
@@ -47,15 +46,14 @@ class Commands:
                 Site.is_active
             ).all()
 
-            def task_args(site):
-                return {
+            def run_task(site):
+                return check_https_status({
                     "site_id": site.id,
                     "site_url": "https://" + site.host,
                     "site_latest_status": site.latest_status,
-                }
+                })
 
-            results = Pool().imap_unordered(
-                check_https_status, [task_args(site) for site in sites])
+            results = [run_task(site) for site in sites]
             for result in results:
                 site = self.db_session.query(Site).get(result["site_id"])
                 result["site"] = site
