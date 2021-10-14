@@ -46,7 +46,10 @@ class RemoteClient:
         scp_client.get(src, dest, recursive=True)
 
     def start_webauth_session(self):
-        config = self.config["webauth"]
+        try:
+            config = self.config["webauth"]
+        except KeyError:
+            raise NoWebauthConfigException
         session = Session()
         response = session.post(config["login_url"], {
             "login": "login",
@@ -73,4 +76,8 @@ class LoginError(BaseException):
 
 
 class WebauthError(BaseException):
+    pass
+
+
+class NoWebauthConfigException(BaseException):
     pass

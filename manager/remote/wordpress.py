@@ -3,7 +3,7 @@
 from dotenv import dotenv_values
 from io import StringIO
 import os
-from manager.remote.client import RemoteClient
+from manager.remote.client import NoWebauthConfigException, RemoteClient
 from manager.remote.filesystem import exists, ls
 
 
@@ -62,4 +62,7 @@ class WordpressClient:
                 self.remote_client.download_file(remote_path, local_path)
 
     def start_webauth_session(self):
-        self.remote_client.start_webauth_session()
+        try:
+            self.remote_client.start_webauth_session()
+        except NoWebauthConfigException:
+            pass
