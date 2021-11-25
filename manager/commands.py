@@ -1,9 +1,11 @@
 
 from datetime import datetime
+
 from manager.backup import backup_drupal_site, backup_wordpress_site
 from termcolor import colored
 
 from manager.database import session
+from manager.logging import Logger
 from manager.notifications.mail import Mailer, Renderer
 from manager.status import check_https_status
 from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
@@ -18,6 +20,14 @@ class CommandBase:
         import_sites(config, self.db_session)
         self.mailer = Mailer(config["mail"])
         self.renderer = Renderer()
+        self.logger = Logger(config["logging"])
+
+    def do_execute(self):
+        start_at = datetime.now()
+        self.execute()
+        end_at = datetime.now()
+        duration = int((end_at - start_at).microseconds / 1000)
+        self.logger.log("{} ({}ms)".format(self.__class__.__name__, duration))
 
 
 class Commands:

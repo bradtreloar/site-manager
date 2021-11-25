@@ -12,7 +12,7 @@ def main():
     with open(args.config) as file:
         config = yaml.safe_load(file)
     command = getattr(Commands, args.command)
-    command(config).execute()
+    command(config).do_execute()
 
 
 def get_args():
