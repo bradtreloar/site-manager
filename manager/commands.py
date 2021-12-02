@@ -2,12 +2,11 @@
 from datetime import datetime
 
 from manager.backup import backup_drupal_site, backup_wordpress_site
-from termcolor import colored
 
 from manager.database import session
 from manager.logging import Logger
 from manager.notifications.mail import Mailer, Renderer
-from manager.status.monitoring import check_https_status
+from manager.status.monitoring import check_https_status, print_https_status_list
 from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
 from manager.sites import Site, SiteSSHConfig, import_sites
 
@@ -107,25 +106,7 @@ class Commands:
             sites = self.db_session.query(Site).filter(
                 Site.is_active
             ).all()
-            status_colors = {
-                SiteStatus.UP: ("grey", "on_green"),
-                SiteStatus.DOWN: ("white", "on_red"),
-                SiteStatus.UNKNOWN: ("grey", "on_yellow"),
-            }
-            print()
-            for site in sites:
-                status = site.latest_status
-                try:
-                    status_age = (datetime.now() -
-                                  site.latest_status_log_entry.created)
-                except AttributeError:
-                    status_age = ""
-                print("{0:.<40} {1} for {2}".format(
-                    site.host,
-                    colored(" {} ".format(
-                        status.value.upper()), *status_colors[status]),
-                    status_age))
-            print()
+            print_https_status_list(sites)
 
     class send_status_report(CommandBase):
         """Sends email report listing website status details."""

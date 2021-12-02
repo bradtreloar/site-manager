@@ -1,9 +1,17 @@
 
 from datetime import datetime
-from manager.status.models import SiteStatus, latest_status
+from termcolor import colored
 import requests
-
 from requests.exceptions import ConnectionError
+
+from manager.status.models import SiteStatus, latest_status
+
+
+STATUS_COLORS = {
+    SiteStatus.UP: ("grey", "on_green"),
+    SiteStatus.DOWN: ("white", "on_red"),
+    SiteStatus.UNKNOWN: ("grey", "on_yellow"),
+}
 
 
 def check_https_status(site_info):
@@ -31,3 +39,20 @@ def check_https_status(site_info):
     result["notify"] = [latest_status, result["status"]] != [
         SiteStatus.UNKNOWN, SiteStatus.UP]
     return result
+
+
+def print_https_status_list(sites):
+    print()
+    for site in sites:
+        status = site.latest_status
+        try:
+            status_age = (datetime.now() -
+                          site.latest_status_log_entry.created)
+        except AttributeError:
+            status_age = ""
+        print("{0:.<40} {1} for {2} days".format(
+            site.host,
+            colored(" {} ".format(
+                status.value.upper()), *STATUS_COLORS[status]),
+            status_age.days))
+    print()
