@@ -4,7 +4,7 @@ from termcolor import colored
 import requests
 from requests.exceptions import ConnectionError
 
-from manager.status.models import SiteStatus, latest_status
+from manager.status.models import SiteStatus
 
 
 STATUS_COLORS = {
@@ -14,31 +14,47 @@ STATUS_COLORS = {
 }
 
 
+class UnexpectedResponseException(BaseException):
+    pass
+
+
 def check_https_status(site_info):
-    start_at = datetime.now()
-    url = site_info["site_url"]
-    latest_status = site_info["site_latest_status"]
-    result = {
-        **site_info,
-        "request_time": start_at,
-    }
-    try:
+    prev_status = site_info["site_latest_status"]
+
+    def do_request():
+        url = site_info["site_url"]
         response = requests.get(url)
-        end_at = datetime.now()
-        result["duration"] = end_at - start_at
-        result["status_code"] = response.status_code
-        if response.status_code == 200:
-            result["status"] = SiteStatus.UP
-        else:
-            result["status"] = SiteStatus.DOWN
-            result["error"] = response.status_code
-    except ConnectionError as ex:
-        result["status"] = SiteStatus.DOWN
-        result["error"] = "Connection error."
-    result["status_changed"] = result["status"] != latest_status
-    result["notify"] = [latest_status, result["status"]] != [
-        SiteStatus.UNKNOWN, SiteStatus.UP]
-    return result
+        status_code = response.status_code
+        if status_code != 200:
+            raise UnexpectedResponseException(response.status_code)
+
+    attempts = 0
+    status = SiteStatus.UNKNOWN
+    duration = None
+    request_time = datetime.now()
+    while attempts < 2 and status != SiteStatus.UP:
+        try:
+            start_at = datetime.now()
+            do_request()
+            end_at = datetime.now()
+            duration = end_at - start_at
+            request_time = start_at
+            status = SiteStatus.UP
+        except ConnectionError:
+            status = SiteStatus.DOWN
+        except UnexpectedResponseException:
+            status = SiteStatus.DOWN
+        attempts += 1
+    status_changed = status != prev_status
+    ignore_status_change = prev_status == SiteStatus.UNKNOWN and status == SiteStatus.UP
+    return {
+        **site_info,
+        "duration": duration,
+        "request_time": request_time,
+        "status": status,
+        "status_changed": status != prev_status,
+        "notify": status_changed and not ignore_status_change,
+    }
 
 
 def print_https_status_list(sites):
