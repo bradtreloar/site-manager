@@ -2,6 +2,7 @@
 from datetime import datetime
 from manager.status.models import SiteStatus, latest_status
 import requests
+
 from requests.exceptions import ConnectionError
 
 

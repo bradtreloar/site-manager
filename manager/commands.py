@@ -7,7 +7,7 @@ from termcolor import colored
 from manager.database import session
 from manager.logging import Logger
 from manager.notifications.mail import Mailer, Renderer
-from manager.status import check_https_status
+from manager.status.monitoring import check_https_status
 from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
 from manager.sites import Site, SiteSSHConfig, import_sites
 
