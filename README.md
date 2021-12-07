@@ -8,7 +8,7 @@ Copy `config.example.yml` and replace examples with real values.
 
 Monitor site availability.
 
-Commands:
+### Commands
 
 ```bash
 # Update statuses for all websites.
@@ -18,13 +18,24 @@ python3 run.py update_https_status
 python3 run.py show_https_status
 ```
 
-The command `update_https_status` will send a notification when a site's status changes from `UP` or `UNKNOWN` to `DOWN` or when a site's status changes from `UP` to `DOWN`. The command tests the site's status by making an HTTPS request to the site's homepage.
+### Notifications
+
+The command `update_https_status` will send a notification when a site's status changes from `UP` or `UNKNOWN` to `DOWN` or when a site's status changes from `DOWN` to `UP`. The command tests the site's status by making an HTTPS request to the site's homepage.
+
+| From      | To     | Action       |
+| --------- | ------ | ------------ |
+| `UP`      | `DOWN` | Notify       |
+| `DOWN`    | `UP`   | Notify       |
+| `UNKNOWN` | `DOWN` | Notify       |
+| `UNKNOWN` | `UP`   | Don't notify |
+
+A site's status will only be `UNKNOWN` until the monitor makes its first attempt to connect to the site. Afterwards the status will alternate between `UP` and `DOWN`.
 
 ## Wordpress and Drupal website Backups
 
 Backup Drupal and Wordpress websites to Amazon S3. The S3 bucket name is derived from the hostname (`sitebackup-example.com`) and the bucket is created if it doesn't exist.
 
-Commands:
+### Commands
 
 ```bash
 # Backup Wordpress sites.
@@ -43,7 +54,7 @@ This backup utility is designed to be used with Roots Bedrock Wordpress.
 - The database settings must be available in `~/wordpress/.env`, and should use the variable names used by Bedrock.
 - The uploads folder must be located at `~/wordpress/web/app/uploads`.
 
-.env variable names:
+`.env` variable names:
 
 | Variable name | Required | Description                                     |
 | :------------ | :------- | :---------------------------------------------- |
@@ -60,7 +71,7 @@ This backup utility is designed to be used with Drupal sites created using the s
 - The database settings must be available in `~/drupal/.env`, and should use the variable names listed below.
 - The sites folder must be located at `~/drupal/web/sites`.
 
-.env variable names:
+`.env` variable names:
 
 | Variable name    | Required | Description                                     |
 | :--------------- | :------- | :---------------------------------------------- |
