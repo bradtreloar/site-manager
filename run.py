@@ -17,10 +17,16 @@ def main():
     args = get_args()
     with open(args.config) as file:
         config = yaml.safe_load(file)
-    logging.basicConfig(
-        filename=config["logging"]["path"],
-        format="%(asctime)s %(levelname)s: %(message)s",
-        level=logging.DEBUG if args.debug else logging.INFO)
+    logging_level = logging.DEBUG if args.debug else logging.INFO
+    if args.verbose:
+        logging.basicConfig(
+            format="%(levelname)s: %(message)s",
+            level=logging_level)
+    else:
+        logging.basicConfig(
+            filename=config["logging"]["path"],
+            format="%(asctime)s %(levelname)s: %(message)s",
+            level=logging_level)
     db_session = session(config["database"])
     import_sites(config["sites"], config["webauth"], db_session)
     try:
@@ -41,6 +47,9 @@ def get_args():
     parser.add_argument('--config',
                         help='path to config',
                         default="./config.yml")
+    parser.add_argument('--verbose',
+                        help='print logs to stdout',
+                        dest='verbose', action='store_true')
     parser.add_argument('--debug',
                         help='print debugging logs',
                         dest='debug', action='store_true')
