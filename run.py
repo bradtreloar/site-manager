@@ -41,17 +41,17 @@ def main():
 
 def get_args():
     parser = ArgumentParser()
-    parser.add_argument('command',
-                        help='the command to execute')
-    parser.add_argument('--config',
-                        help='path to config',
+    parser.add_argument("command",
+                        help="the command to execute")
+    parser.add_argument("--config",
+                        help="path to config",
                         default="./config.yml")
-    parser.add_argument('--verbose',
-                        help='print logs to stdout',
-                        dest='verbose', action='store_true')
-    parser.add_argument('--debug',
-                        help='print debugging logs',
-                        dest='debug', action='store_true')
+    parser.add_argument("--verbose",
+                        help="print logs to stdout",
+                        dest="verbose", action="store_true")
+    parser.add_argument("--debug",
+                        help="print debugging logs",
+                        dest="debug", action="store_true")
     return parser.parse_args()
 
 

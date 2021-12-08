@@ -27,9 +27,7 @@ class Commands:
         """Displays help text."""
 
         def execute(self):
-            print()
-            print("Available commands:")
-            print()
+            print("\nAvailable commands:\n")
             commands = []
             for attr_name in dir(Commands):
                 attr = getattr(Commands, attr_name)
