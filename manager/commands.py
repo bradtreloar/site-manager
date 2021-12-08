@@ -1,5 +1,7 @@
 
 from datetime import datetime
+import logging
+from time import perf_counter
 
 from manager.backup import backup_drupal_site, backup_wordpress_site
 from manager.notifications.mail import Mailer, render_template
@@ -125,7 +127,7 @@ class Commands:
     class backup_apps(CommandBase):
         """Backs up apps to Amazon S3"""
 
-        CALLBACKS = {
+        BACKUP_FUNCTIONS = {
             "wordpress": backup_wordpress_site,
             "drupal": backup_drupal_site,
         }
@@ -136,12 +138,16 @@ class Commands:
                 Site.app is not None
             ).all()
             for site in sites:
-                self.CALLBACKS[site.app](
+                logging.debug(f"started backup: {site.app}, {site.host}")
+                start_at = perf_counter()
+                self.BACKUP_FUNCTIONS[site.app](
                     site.id,
                     site.host,
                     site.ssh_config.to_dict(),
                     "sitebackup-" + site.host,
                     self.config["aws"])
+                duration = (perf_counter() - start_at) * 1000
+                logging.info(f"{site.app} {site.host}, ({int(duration)}ms)")
 
 
 class CommandError(BaseException):
