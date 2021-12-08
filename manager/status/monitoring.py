@@ -68,7 +68,6 @@ def print_https_status_list(sites):
             status_age = ""
         print("{0:.<40} {1} for {2} days".format(
             site.host,
-            colored(" {} ".format(
-                status.value.upper()), *STATUS_COLORS[status]),
+            colored(f" {status.value.upper()} ", *STATUS_COLORS[status]),
             status_age.days))
     print()

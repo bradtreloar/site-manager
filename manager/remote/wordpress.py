@@ -36,8 +36,7 @@ class WordpressClient:
     def export_database(self, filepath):
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         home_path = self.remote_client.exec_command("pwd")
-        self.remote_client.exec_command(
-            "mkdir -p {}/tmp".format(home_path))
+        self.remote_client.exec_command(f"mkdir -p {home_path}/tmp")
         temporary_database_filepath = home_path + "/tmp/wordpress.sql"
         site_settings = self.site_settings()
         database_settings = site_settings["database"]
@@ -49,8 +48,7 @@ class WordpressClient:
         )
         self.remote_client.exec_command(command)
         self.remote_client.download_file(temporary_database_filepath, filepath)
-        self.remote_client.exec_command(
-            "rm {}".format(temporary_database_filepath))
+        self.remote_client.exec_command(f"rm {temporary_database_filepath}")
 
     def download_site_files(self, dirpath):
         uploads_path = "web/app/uploads"

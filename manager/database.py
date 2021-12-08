@@ -14,7 +14,7 @@ Model = declarative_base()
 def session(config):
     filepath = config["path"]
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    db = create_engine("sqlite+pysqlite:///{}".format(filepath))
+    db = create_engine(f"sqlite+pysqlite:///{filepath}")
     Model.metadata.create_all(db)
     session = sessionmaker(bind=db)()
     return session

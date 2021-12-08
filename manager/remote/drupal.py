@@ -61,13 +61,11 @@ class DrupalClient:
         }
 
     def export_database(self, site_name, site_settings, dirpath):
-        filepath = dirpath + "/data/{}/drupal.sql".format(site_name)
+        filepath = dirpath + f"/data/{site_name}/drupal.sql"
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         home_path = self.remote_client.exec_command("pwd")
-        self.remote_client.exec_command(
-            "mkdir -p {}/tmp".format(home_path))
-        temporary_database_filepath = "{}/tmp/drupal_{}.sql".format(
-            home_path, site_name)
+        self.remote_client.exec_command(f"mkdir -p {home_path}/tmp")
+        temporary_database_filepath = f"{home_path}/tmp/drupal_{site_name}.sql"
         database_settings = site_settings["database"]
         command = "MYSQL_PWD='{password}' mysqldump --user='{username}' '{database}' > {file}".format(
             database=database_settings["database"],
@@ -77,11 +75,10 @@ class DrupalClient:
         )
         self.remote_client.exec_command(command)
         self.remote_client.download_file(temporary_database_filepath, filepath)
-        self.remote_client.exec_command(
-            "rm {}".format(temporary_database_filepath))
+        self.remote_client.exec_command(f"rm {temporary_database_filepath}")
 
     def download_site_files(self, site_name, dirpath):
-        files_path = "web/sites/{}/files".format(site_name)
+        files_path = f"web/sites/{site_name}/files"
         os.makedirs(os.path.join(dirpath, files_path), exist_ok=True)
         for filename in ls(self.remote_client, "drupal/" + files_path):
             if filename not in IGNORED_FILES:

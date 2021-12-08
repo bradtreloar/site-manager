@@ -54,8 +54,7 @@ class Site(Model):
     is_active = Column(Boolean, default=True, nullable=False)
 
     def __repr__(self):
-        return "<Site(site='{}')>".format(
-            self.host)
+        return f"<Site(site='{self.host}')>"
 
 
 class SiteSSHConfig(Model):
@@ -73,8 +72,7 @@ class SiteSSHConfig(Model):
     site = relationship(Site, back_populates="ssh_config")
 
     def __repr__(self):
-        return "<SiteSSHConfig(site='{}')>".format(
-            self.site.host)
+        return f"<SiteSSHConfig(site='{self.site.host}')>"
 
     def to_dict(self):
         return {

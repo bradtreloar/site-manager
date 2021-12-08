@@ -34,7 +34,7 @@ class Commands:
                 if type(attr).__name__ == "type" and attr.__base__.__name__ == "CommandBase":
                     commands.append(attr)
             for command in commands:
-                print("{:<24}{}".format(command.__name__, command.__doc__))
+                print(f"{command.__name__:<24}{command.__doc__}")
             print()
 
     class update_https_status(CommandBase):
@@ -72,7 +72,7 @@ class Commands:
                 "status_color": status_colors[result["status"].value],
                 "status_details": [
                     ("URL",
-                     '<a href="{0}">{0}</a>'.format(result["site_url"])),
+                     '<a href="{}">{}</a>'.format(result["site_url"])),
                     ("Request time", result["request_time"]),
                 ]
             }

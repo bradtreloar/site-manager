@@ -32,8 +32,7 @@ class StatusLogEntry(Model):
     site = relationship(Site, back_populates="status_log_entries")
 
     def __repr__(self):
-        return "<StatusLogEntry(site='{}')>".format(
-            self.site.host)
+        return f"<StatusLogEntry(site='{self.site.host}')>"
 
 
 Site.status_log_entries = relationship(StatusLogEntry,
