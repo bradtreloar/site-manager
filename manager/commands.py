@@ -3,24 +3,21 @@ from datetime import datetime
 
 from manager.backup import backup_drupal_site, backup_wordpress_site
 
-from manager.database import session
 from manager.logging import Logger
 from manager.notifications.mail import Mailer, render_template
 from manager.status.monitoring import check_https_status, print_https_status_list
 from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
-from manager.sites import Site, SiteSSHConfig, import_sites
+from manager.sites import Site, SiteSSHConfig
 
 
 class CommandBase:
 
     def __init__(self, config):
         self.config = config
-        self.db_session = session(config["database"])
-        import_sites(config, self.db_session)
         self.mailer = Mailer(config["mail"])
         self.logger = Logger(config["logging"])
 
-    def do_execute(self):
+    def __call__(self):
         start_at = datetime.now()
         self.execute()
         end_at = datetime.now()

@@ -7,9 +7,9 @@ from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 from manager.database import Model
 
 
-def import_sites(config, db_session):
+def import_sites(sites_config, webauth_config, db_session):
     """Adds or updates each site from the config in the database."""
-    for site_host, site_config in config["sites"].items():
+    for site_host, site_config in sites_config.items():
         site_config["host"] = site_host
         site_attributes = {
             "host": site_host,
@@ -30,9 +30,9 @@ def import_sites(config, db_session):
             if "host" not in ssh_config_attributes.keys():
                 ssh_config_attributes["host"] = site_host
             ssh_host = ssh_config_attributes["host"]
-            if ssh_host in config["webauth"].keys():
+            if ssh_host in webauth_config.keys():
                 ssh_config_attributes["webauth"] = json.dumps(
-                    config["webauth"][ssh_host])
+                    webauth_config[ssh_host])
             if not site.ssh_config:
                 site.ssh_config = SiteSSHConfig(**ssh_config_attributes)
             else:
@@ -41,11 +41,7 @@ def import_sites(config, db_session):
         db_session.commit()
     sites = db_session.query(Site).all()
     for site in sites:
-        try:
-            config["sites"][site.host]
-            site.is_active = True
-        except KeyError:
-            site.is_active = False
+        site.is_active = site.host in sites_config.keys()
     db_session.commit()
 
 
