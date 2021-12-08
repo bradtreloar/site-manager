@@ -31,18 +31,14 @@ The command `update_https_status` will send a notification when a site's status 
 
 A site's status will only be `UNKNOWN` until the monitor makes its first attempt to connect to the site. Afterwards the status will alternate between `UP` and `DOWN`.
 
-## Wordpress and Drupal website Backups
+## App backups (Wordpress and Drupal only)
 
 Backup Drupal and Wordpress websites to Amazon S3. The S3 bucket name is derived from the hostname (`sitebackup-example.com`) and the bucket is created if it doesn't exist.
 
 ### Commands
 
 ```bash
-# Backup Wordpress sites.
-python3 run.py backup_wordpress
-
-# Backup Drupal 8+ sites.
-python3 run.py backup_drupal
+python3 run.py backup_apps
 ```
 
 ### Site requirements

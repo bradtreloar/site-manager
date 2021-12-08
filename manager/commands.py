@@ -2,8 +2,6 @@
 from datetime import datetime
 
 from manager.backup import backup_drupal_site, backup_wordpress_site
-
-from manager.logging import Logger
 from manager.notifications.mail import Mailer, render_template
 from manager.status.monitoring import check_https_status, print_https_status_list
 from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
@@ -16,14 +14,9 @@ class CommandBase:
         self.config = config
         self.db_session = db_session
         self.mailer = Mailer(config["mail"])
-        self.logger = Logger(config["logging"])
 
     def __call__(self):
-        start_at = datetime.now()
         self.execute()
-        end_at = datetime.now()
-        duration = int((end_at - start_at).microseconds / 1000)
-        self.logger.log("{} ({}ms)".format(self.__class__.__name__, duration))
 
 
 class Commands:
@@ -129,45 +122,26 @@ class Commands:
             })
             self.mailer.notify("Status report", message_body)
 
-    class backup_wordpress(CommandBase):
-        """Backs up Wordpress websites to Amazon S3"""
+    class backup_apps(CommandBase):
+        """Backs up apps to Amazon S3"""
+
+        CALLBACKS = {
+            "wordpress": backup_wordpress_site,
+            "drupal": backup_drupal_site,
+        }
 
         def execute(self):
             sites = self.db_session.query(Site).join(SiteSSHConfig).filter(
                 Site.is_active,
-                Site.app == "wordpress"
+                Site.app is not None
             ).all()
-
-            def task_args(site):
-                return ({
-                    "site_id": site.id,
-                    "site_host": site.host,
-                    "backup_bucket": "sitebackup-" + site.host,
-                    "ssh_config": site.ssh_config.to_dict(),
-                }, self.config["aws"])
-
             for site in sites:
-                backup_wordpress_site(task_args(site))
-
-    class backup_drupal(CommandBase):
-        """Backs up Drupal websites to Amazon S3"""
-
-        def execute(self):
-            sites = self.db_session.query(Site).join(SiteSSHConfig).filter(
-                Site.is_active,
-                Site.app == "drupal"
-            ).all()
-
-            def task_args(site):
-                return ({
-                    "site_id": site.id,
-                    "site_host": site.host,
-                    "backup_bucket": "sitebackup-" + site.host,
-                    "ssh_config": site.ssh_config.to_dict(),
-                }, self.config["aws"])
-
-            for site in sites:
-                backup_drupal_site(task_args(site))
+                self.CALLBACKS[site.app](
+                    site.id,
+                    site.host,
+                    site.ssh_config.to_dict(),
+                    "sitebackup-" + site.host,
+                    self.config["aws"])
 
 
 class CommandError(BaseException):
