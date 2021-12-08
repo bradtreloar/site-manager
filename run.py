@@ -15,8 +15,11 @@ def main():
         config = yaml.safe_load(file)
     db_session = session(config["database"])
     import_sites(config["sites"], config["webauth"], db_session)
-    command = getattr(Commands, args.command)
-    command(config)()
+    try:
+        command = getattr(Commands, args.command)
+        command(config, db_session)()
+    except AttributeError:
+        print("Error: Command does not exist: " + args.command)
 
 
 def get_args():

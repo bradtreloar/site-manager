@@ -12,8 +12,9 @@ from manager.sites import Site, SiteSSHConfig
 
 class CommandBase:
 
-    def __init__(self, config):
+    def __init__(self, config, db_session):
         self.config = config
+        self.db_session = db_session
         self.mailer = Mailer(config["mail"])
         self.logger = Logger(config["logging"])
 
@@ -50,15 +51,11 @@ class Commands:
             sites = self.db_session.query(Site).filter(
                 Site.is_active
             ).all()
-
-            def run_task(site):
-                return check_https_status({
-                    "site_id": site.id,
-                    "site_url": "https://" + site.host,
-                    "site_latest_status": site.latest_status,
-                })
-
-            results = [run_task(site) for site in sites]
+            results = [check_https_status({
+                "site_id": site.id,
+                "site_url": "https://" + site.host,
+                "site_latest_status": site.latest_status,
+            }) for site in sites]
             for result in results:
                 site = self.db_session.query(Site).get(result["site_id"])
                 result["site"] = site
