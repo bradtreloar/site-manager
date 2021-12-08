@@ -32,8 +32,7 @@ def main():
     try:
         command = getattr(Commands, args.command)
         command(config, db_session)()
-        end_at = perf_counter()
-        duration = (end_at - start_at) * 1000
+        duration = (perf_counter() - start_at) * 1000
         logging.info(f"{args.command} ({int(duration)}ms)")
     except AttributeError:
         print("Error: Command does not exist: " + args.command)

@@ -8,12 +8,6 @@ from manager.remote.drupal import DrupalClient
 from manager.aws import S3BackupBucketClient
 
 
-CLIENTS = {
-    "drupal": DrupalClient,
-    "wordpress": WordpressClient,
-}
-
-
 def backup_wordpress_site(
         site_id,
         site_host,
@@ -23,7 +17,7 @@ def backup_wordpress_site(
     app = "wordpress"
     temp_dir = f"/tmp/{app}_backups/{site_host}/"
     # Download backup.
-    client = CLIENTS[app](
+    client = WordpressClient(
         ssh_config, backup_bucket)
     client.start_webauth_session()
     client.export_database(f"{temp_dir}/data/{app}.sql")
@@ -50,7 +44,7 @@ def backup_drupal_site(
         aws_config):
     app = "drupal"
     temp_dir = f"/tmp/{app}_backups/{site_host}/"
-    client = CLIENTS[app](ssh_config, backup_bucket)
+    client = DrupalClient(ssh_config, backup_bucket)
     client.start_webauth_session()
     # The Drupal installation may include several sites, so we need to collect
     # the machine name and database settings for each.
