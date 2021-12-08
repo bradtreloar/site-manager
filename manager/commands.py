@@ -5,7 +5,7 @@ from manager.backup import backup_drupal_site, backup_wordpress_site
 
 from manager.database import session
 from manager.logging import Logger
-from manager.notifications.mail import Mailer, Renderer
+from manager.notifications.mail import Mailer, render_template
 from manager.status.monitoring import check_https_status, print_https_status_list
 from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
 from manager.sites import Site, SiteSSHConfig, import_sites
@@ -18,7 +18,6 @@ class CommandBase:
         self.db_session = session(config["database"])
         import_sites(config, self.db_session)
         self.mailer = Mailer(config["mail"])
-        self.renderer = Renderer()
         self.logger = Logger(config["logging"])
 
     def do_execute(self):
@@ -96,7 +95,7 @@ class Commands:
                 status=result["status"].value.upper(),
                 host=result["site"].host,
             )
-            message_body = self.renderer.render("status.status_changed", data)
+            message_body = render_template("status.status_changed", data)
             self.mailer.notify(message_subject, message_body)
 
     class show_https_status(CommandBase):
@@ -131,7 +130,7 @@ class Commands:
                         "status_duration": datetime.now() - entry.created,
                     }
 
-            message_body = self.renderer.render("status.status_report", {
+            message_body = render_template("status.status_report", {
                 "table_rows": list(table_rows()),
             })
             self.mailer.notify("Status report", message_body)

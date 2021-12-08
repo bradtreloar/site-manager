@@ -41,15 +41,10 @@ class Mailer:
                 )
 
 
-class Renderer:
+def render_template(template_name, data):
+    """Render a Jinja2 template with given data object."""
 
-    def __init__(self):
-        self.env = Environment(
-            loader=FunctionLoader(self.load_template),
-            autoescape=select_autoescape()
-        )
-
-    def load_template(self, template_name):
+    def load_template(template_name):
         path_components = template_name.split(".")
         module_name = path_components[0]
         module_path = os.path.join(manager.__path__[0], module_name)
@@ -62,7 +57,10 @@ class Renderer:
         with open(template_path) as template_file:
             return template_file.read()
 
-    def render(self, template_name, data):
-        template = self.env.get_template(template_name)
-        output = template.render(**data)
-        return output
+    # Render the template with the given data.
+    template = Environment(
+        loader=FunctionLoader(load_template),
+        autoescape=select_autoescape()
+    ).get_template(template_name)
+    output = template.render(**data)
+    return output
