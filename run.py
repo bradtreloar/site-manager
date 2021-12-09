@@ -17,6 +17,7 @@ def main():
     args = get_args()
     with open(args.config) as file:
         config = yaml.safe_load(file)
+    # Configure logging.
     logging_level = logging.DEBUG if args.debug else logging.INFO
     if args.verbose:
         logging.basicConfig(
@@ -27,16 +28,20 @@ def main():
             filename=config["logging"]["path"],
             format="%(asctime)s %(levelname)s: %(message)s",
             level=logging_level)
+    # Import sites from config into database.
     db_session = session(config["database"])
     import_sites(config["sites"], config["webauth"], db_session)
+    # Run the command and log the result.
+    # (Pass the existing database session object to the command object.)
     try:
         command = getattr(Commands, args.command)
         command(config, db_session)()
         duration = (perf_counter() - start_at) * 1000
         logging.info(f"{args.command} ({int(duration)}ms)")
-    except AttributeError:
-        print("Error: Command does not exist: " + args.command)
-        logging.error("Command does not exist: " + args.command)
+    except AttributeError as ex:
+        print(ex)
+        # print("Error: Command does not exist: " + args.command)
+        # logging.error("Command does not exist: " + args.command)
 
 
 def get_args():

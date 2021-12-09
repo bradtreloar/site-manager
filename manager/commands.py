@@ -1,4 +1,5 @@
 
+import asyncio
 from datetime import datetime
 import logging
 from time import perf_counter
@@ -44,24 +45,32 @@ class Commands:
             sites = self.db_session.query(Site).filter(
                 Site.is_active
             ).all()
-            results = [check_https_status({
-                "site_id": site.id,
-                "site_url": "https://" + site.host,
-                "site_latest_status": site.latest_status,
-            }) for site in sites]
+
+            async def get_results():
+                results = []
+                for site in sites:
+                    result = await check_https_status({
+                        "site_id": site.id,
+                        "site_url": "https://" + site.host,
+                        "site_latest_status": site.latest_status,
+                    })
+                    result["site"] = site
+                    results.append(result)
+                return results
+
+            event_loop = asyncio.new_event_loop()
+            results = event_loop.run_until_complete(get_results())
             for result in results:
-                site = self.db_session.query(Site).get(result["site_id"])
-                result["site"] = site
                 if result["status_changed"]:
                     status_log_entry = StatusLogEntry(
-                        site=site,
+                        site=result["site"],
                         type=StatusLogType.HTTPS,
                         status=result["status"],
                         created=datetime.now(),
                     )
                     self.db_session.add(status_log_entry)
-                    if result["notify"]:
-                        self.notify_status_change(result)
+                if result["notify"]:
+                    self.notify_status_change(result)
             self.db_session.commit()
 
         def notify_status_change(self, result):
@@ -72,7 +81,7 @@ class Commands:
                 "status_color": status_colors[result["status"].value],
                 "status_details": [
                     ("URL",
-                     '<a href="{}">{}</a>'.format(result["site_url"])),
+                     '<a href="{0}">{0}</a>'.format(result["site_url"])),
                     ("Request time", result["request_time"]),
                 ]
             }

@@ -1,8 +1,7 @@
 
+import aiohttp
 from datetime import datetime
 from termcolor import colored
-import requests
-from requests.exceptions import ConnectionError
 
 from manager.status.models import SiteStatus
 
@@ -18,24 +17,21 @@ class UnexpectedResponseException(BaseException):
     pass
 
 
-def check_https_status(site_info):
+async def check_https_status(site_info):
     prev_status = site_info["site_latest_status"]
-
-    def do_request():
-        url = site_info["site_url"]
-        response = requests.get(url)
-        status_code = response.status_code
-        if status_code != 200:
-            raise UnexpectedResponseException(response.status_code)
-
-    attempts = 0
     status = SiteStatus.UNKNOWN
     duration = None
     request_time = datetime.now()
+    attempts = 0
     while attempts < 2 and status != SiteStatus.UP:
         try:
             start_at = datetime.now()
-            do_request()
+            url = site_info["site_url"]
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    status_code = response.status
+                    if status_code != 200:
+                        raise UnexpectedResponseException(status_code)
             end_at = datetime.now()
             duration = end_at - start_at
             request_time = start_at
