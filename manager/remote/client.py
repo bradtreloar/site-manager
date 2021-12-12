@@ -5,7 +5,7 @@ from paramiko import AutoAddPolicy, SSHClient
 from scp import SCPClient
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS = 'ALL:@SECLEVEL=1'
+requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS = 'ALL:@SECLEVEL=1'  # type: ignore
 
 
 class RemoteCommandError(BaseException):
