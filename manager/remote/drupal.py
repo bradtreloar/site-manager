@@ -7,10 +7,10 @@ import shutil
 from manager.remote.client import NoWebauthConfigException, RemoteClient
 from manager.remote.filesystem import exists, ls
 
-IGNORED_FILES = ["php", "css", "js", "styles", "simpletest"]
-
 
 class DrupalClient:
+
+    IGNORED_FILES = ["php", "css", "js", "styles", "simpletest"]
 
     def __init__(self, ssh_config, backup_bucket):
         self.remote_client = RemoteClient(ssh_config)
@@ -81,7 +81,7 @@ class DrupalClient:
         files_path = f"web/sites/{site_name}/files"
         os.makedirs(os.path.join(dirpath, files_path), exist_ok=True)
         for filename in ls(self.remote_client, "drupal/" + files_path):
-            if filename not in IGNORED_FILES:
+            if filename not in self.IGNORED_FILES:
                 remote_path = "drupal/" + files_path + "/" + filename
                 local_path = os.path.join(dirpath, files_path, filename)
                 self.remote_client.download_file(remote_path, local_path)
