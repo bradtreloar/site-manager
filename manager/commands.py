@@ -28,13 +28,10 @@ class Commands:
         """Displays help text."""
 
         def execute(self):
-            print("\nAvailable commands:\n")
-            commands = []
-            for attr_name in dir(Commands):
-                attr = getattr(Commands, attr_name)
-                if type(attr).__name__ == "type" and attr.__base__.__name__ == "CommandBase":
-                    commands.append(attr)
-            for command in commands:
+            print()
+            print("Available commands:")
+            print()
+            for command in commands():
                 print(f"{command.__name__:<24}{command.__doc__}")
             print()
 
@@ -157,5 +154,20 @@ class Commands:
                 logging.info(f"{site.app} {site.host}, ({int(duration)}ms)")
 
 
-class CommandError(BaseException):
-    pass
+def commands():
+    """
+    Generates a list of commands.
+    """
+    for attr_name in dir(Commands):
+        attr = getattr(Commands, attr_name)
+        if type(attr).__name__ == "type" and attr.__base__.__name__ == "CommandBase":
+            yield attr
+
+
+def get_command(command_name):
+    """
+    Fetch a command given its name or alias.
+    """
+    for command in commands():
+        if command_name == command.__name__:
+            return command
