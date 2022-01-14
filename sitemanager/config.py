@@ -10,7 +10,16 @@ DEFAULT_CONFIG = {
 }
 
 
-def load_config(config_filepath):
-    with open(config_filepath) as file:
+def load_config(filepath):
+    """
+    Load config, falling back to default values where possible.
+
+    Params:
+        filepath: the path to the config YAML file.
+
+    Returns:
+        The config dictionary.
+    """
+    with open(filepath) as file:
         config = yaml.safe_load(file)
     return DEFAULT_CONFIG.update(config)
