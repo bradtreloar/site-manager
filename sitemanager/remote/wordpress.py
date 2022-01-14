@@ -3,8 +3,8 @@
 from dotenv import dotenv_values
 from io import StringIO
 import os
-from manager.remote.client import NoWebauthConfigException, RemoteClient
-from manager.remote.filesystem import exists, ls
+from sitemanager.remote.client import NoWebauthConfigException, RemoteClient
+from sitemanager.remote.filesystem import exists, ls
 
 
 class WordpressClient:

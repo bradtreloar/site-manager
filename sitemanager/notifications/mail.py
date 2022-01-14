@@ -6,7 +6,7 @@ import smtplib
 import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import manager
+import sitemanager
 
 
 class Mailer:
@@ -47,12 +47,12 @@ def render_template(template_name, data):
     def load_template(template_name):
         path_components = template_name.split(".")
         module_name = path_components[0]
-        module_path = os.path.join(manager.__path__[0], module_name)
+        module_path = os.path.join(sitemanager.__path__[0], module_name)
         if not os.path.exists(module_path):
             path_components.insert(0, "notifications")
         path_components.insert(1, "templates")
         template_path = os.path.join(*path_components)
-        template_path = os.path.join(manager.__path__[0], template_path)
+        template_path = os.path.join(sitemanager.__path__[0], template_path)
         template_path += ".html.j2"
         with open(template_path) as template_file:
             return template_file.read()

@@ -4,11 +4,11 @@ from datetime import datetime
 import logging
 from time import perf_counter
 
-from manager.backup import backup_drupal_site, backup_wordpress_site
-from manager.notifications.mail import Mailer, render_template
-from manager.status.monitoring import check_https_status, print_https_status_list
-from manager.status.models import SiteStatus, StatusLogEntry, StatusLogType
-from manager.sites import Site, SiteSSHConfig
+from sitemanager.backup import backup_drupal_site, backup_wordpress_site
+from sitemanager.notifications.mail import Mailer, render_template
+from sitemanager.status.monitoring import check_https_status, print_https_status_list
+from sitemanager.status.models import SiteStatus, StatusLogEntry, StatusLogType
+from sitemanager.sites import Site, SiteSSHConfig
 
 
 class CommandBase:

@@ -4,9 +4,9 @@ import logging
 from time import perf_counter
 import yaml
 
-from manager.commands import get_command
-from manager.database import session
-from manager.sites import import_sites
+from sitemanager.commands import get_command
+from sitemanager.database import session
+from sitemanager.sites import import_sites
 
 # Suppress warnings.
 if not sys.warnoptions:

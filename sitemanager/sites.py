@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 
-from manager.database import Model
+from sitemanager.database import Model
 
 
 def import_sites(sites_config, webauth_config, db_session):

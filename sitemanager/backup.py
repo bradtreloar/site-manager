@@ -2,10 +2,10 @@
 from datetime import datetime
 import os
 import shutil
-from manager.archive import make_backup_archive
-from manager.remote.wordpress import WordpressClient
-from manager.remote.drupal import DrupalClient
-from manager.aws import S3BackupBucketClient
+from sitemanager.archive import make_backup_archive
+from sitemanager.remote.wordpress import WordpressClient
+from sitemanager.remote.drupal import DrupalClient
+from sitemanager.aws import S3BackupBucketClient
 
 
 def backup_wordpress_site(

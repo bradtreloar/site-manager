@@ -1,6 +1,6 @@
 
 
-from manager.remote.client import RemoteCommandError
+from sitemanager.remote.client import RemoteCommandError
 
 
 def exists(client, path):

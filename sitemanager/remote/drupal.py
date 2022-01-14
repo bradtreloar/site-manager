@@ -4,8 +4,8 @@ from io import StringIO
 import os
 import re
 import shutil
-from manager.remote.client import NoWebauthConfigException, RemoteClient
-from manager.remote.filesystem import exists, ls
+from sitemanager.remote.client import NoWebauthConfigException, RemoteClient
+from sitemanager.remote.filesystem import exists, ls
 
 
 class DrupalClient:

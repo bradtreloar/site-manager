@@ -4,8 +4,8 @@ from sqlalchemy import (
     Column, UniqueConstraint,
     Date, DateTime, Enum, ForeignKey, Numeric, Integer, String)
 from sqlalchemy.orm import relationship
-from manager.database import Model
-from manager.sites import Site
+from sitemanager.database import Model
+from sitemanager.sites import Site
 
 
 class StatusLogType(enum.Enum):
