@@ -5,7 +5,7 @@ from time import perf_counter
 import yaml
 
 from sitemanager.commands import get_command
-from sitemanager.database import session
+from sitemanager.database import get_db_session
 from sitemanager.sites import import_sites
 
 # Suppress warnings.
@@ -44,7 +44,7 @@ def main():
     command_name = args.command.replace("-", "_")
 
     # Import sites from config into database.
-    db_session = session(config["database"])
+    db_session = get_db_session(config["database"])
     import_sites(config["sites"], config["webauth"], db_session)
 
     # Run the command and log the result.
