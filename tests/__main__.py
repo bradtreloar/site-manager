@@ -2,10 +2,12 @@
 import unittest
 
 from tests.commands import CommandTests
+from tests.sites import SiteTests
 
 
 TESTCASES = {
     CommandTests,
+    SiteTests
 }
 
 
