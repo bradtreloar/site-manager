@@ -1,15 +1,9 @@
 
-from random import randint, choice as random_choice
-import string
 from unittest import TestCase
 
 from sitemanager.database import get_db_session
 from sitemanager.sites import import_sites, Site, SiteSSHConfig
-
-
-def random_string(length):
-    return "".join(
-        [random_choice(string.ascii_uppercase) for _ in range(length)])
+from tests.fakes import fake_site, fake_site_ssh_config
 
 
 mock_database_config = {
@@ -40,31 +34,6 @@ mock_sites_config = {
 mock_webauth_config = {}
 
 
-def clear_database(db_session):
-    db_session.query(Site).delete()
-    db_session.query(SiteSSHConfig).delete()
-
-
-def fake_host():
-    return "{}.com".format(
-        ''.join(random_choice(
-            string.ascii_letters) for x in range(randint(6, 12))))
-
-
-def fake_site(values={}):
-    return Site(
-        host=values.get("host", fake_host()),
-        is_active=values.get("is_active", True))
-
-
-def fake_site_ssh_config(site, values={}):
-    return SiteSSHConfig(
-        site=site,
-        host=values.get("host", fake_host()),
-        port=values.get("port", 22),
-        user=values.get("user", random_string(20)))
-
-
 def seed_database(db_session, site_count):
     for _ in range(site_count):
         site = fake_site()
@@ -72,6 +41,11 @@ def seed_database(db_session, site_count):
         db_session.add(site)
         db_session.add(site_ssh_config)
     db_session.commit()
+
+
+def clear_database(db_session):
+    db_session.query(Site).delete()
+    db_session.query(SiteSSHConfig).delete()
 
 
 class SiteTests(TestCase):
