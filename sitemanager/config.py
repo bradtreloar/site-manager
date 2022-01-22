@@ -20,6 +20,13 @@ def load_config(filepath):
     Returns:
         The config dictionary.
     """
+
+    # Create a new config from defaults.
+    config = dict(DEFAULT_CONFIG)
+
+    # Overwrite defaults with values from config file.
     with open(filepath) as file:
-        config = yaml.safe_load(file)
-    return DEFAULT_CONFIG.update(config)
+        config.update(yaml.safe_load(file))
+
+    # Return the merged config.
+    return config
