@@ -1,7 +1,6 @@
 
 from random import randint, choice as random_choice
 import string
-from unittest import TestCase
 
 from sitemanager.sites import Site, SiteSSHConfig
 
