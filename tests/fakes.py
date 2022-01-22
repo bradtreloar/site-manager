@@ -33,6 +33,7 @@ def fake_config(config={}):
                 }
             }
         },
+        "aws": fake_aws_config(),
         "mail": {
             "to": "recipient@example.com",
             "from": "sender@example.com",
@@ -42,10 +43,18 @@ def fake_config(config={}):
             "password": "example_password",
             "use_tls": "False",
         },
-        "webauth": {}
+        "webauth": {},
     }
     default_config.update(config)
     return default_config
+
+
+def fake_aws_config(config={}):
+    return {
+        "region": random_string(20),
+        "aws_access_key_id": random_string(20),
+        "aws_secret_access_key": random_string(20),
+    }
 
 
 def fake_host():
