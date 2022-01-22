@@ -23,6 +23,18 @@ sites:
 database:
   path: ./tmp/sqlite.db
 
+# Backups config
+#
+# The filesystem used to store backups. Options are "local" and "s3".
+backup:
+  filesystem: s3
+  bucket: "sitebackup-{site_host}"
+
+# Alternative backup config for local backups.
+# backup:
+#   filesystem: local
+#   path: path/to/backups/dir
+
 # AWS S3 config
 #
 # Region is used when creating buckets for site backups.

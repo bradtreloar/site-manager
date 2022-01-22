@@ -10,14 +10,15 @@ from sitemanager.remote.filesystem import exists, ls
 
 class DrupalClient:
 
-    IGNORED_FILES = ["php", "css", "js", "styles", "simpletest"]
+    IGNORED_GENERATED_FILES = ["php", "css", "js", "styles", "simpletest"]
 
-    def __init__(self, ssh_config, backup_bucket):
+    def __init__(self, ssh_config):
         self.remote_client = RemoteClient(ssh_config)
-        self.backup_bucket = backup_bucket
+        self.docroot = "drupal"
+        self._sites_settings = None
 
     def exists(self):
-        return exists(self.remote_client, "drupal")
+        return exists(self.remote_client, self.docroot)
 
     def version(self):
         status = self.remote_client.exec_command(
@@ -40,11 +41,13 @@ class DrupalClient:
                     site_names.append(site_name)
         return site_names
 
+    @property
     def sites_settings(self):
-        sites_settings = {}
-        for site_name in self.site_names():
-            sites_settings[site_name] = self.site_settings(site_name)
-        return sites_settings
+        if not self._sites_settings:
+            self._sites_settings = {}
+            for site_name in self.site_names():
+                self._sites_settings[site_name] = self.site_settings(site_name)
+        return self._sites_settings
 
     def site_settings(self, site_name):
         dotenv = self.remote_client.exec_command("cat drupal/.env")
@@ -59,6 +62,10 @@ class DrupalClient:
                 "password": settings[prefix + "_DBPASS"],
             }
         }
+
+    def export_databases(self, dirpath):
+        for site_name, site_settings in self.sites_settings.items():
+            self.export_database(site_name, site_settings, dirpath)
 
     def export_database(self, site_name, site_settings, dirpath):
         filepath = dirpath + f"/data/{site_name}/drupal.sql"
@@ -77,11 +84,15 @@ class DrupalClient:
         self.remote_client.download_file(temporary_database_filepath, filepath)
         self.remote_client.exec_command(f"rm {temporary_database_filepath}")
 
+    def download_generated_files(self, dirpath):
+        for site_name, site_settings in self.sites_settings.items():
+            self.download_site_files(site_name, dirpath)
+
     def download_site_files(self, site_name, dirpath):
         files_path = f"web/sites/{site_name}/files"
         os.makedirs(os.path.join(dirpath, files_path), exist_ok=True)
         for filename in ls(self.remote_client, "drupal/" + files_path):
-            if filename not in self.IGNORED_FILES:
+            if filename not in self.IGNORED_GENERATED_FILES:
                 remote_path = "drupal/" + files_path + "/" + filename
                 local_path = os.path.join(dirpath, files_path, filename)
                 self.remote_client.download_file(remote_path, local_path)

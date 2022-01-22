@@ -4,7 +4,7 @@ from datetime import datetime
 import logging
 from time import perf_counter
 
-from sitemanager.backup import backup_drupal_site, backup_wordpress_site
+from sitemanager.backup import backup_app, backup_drupal_site, backup_wordpress_site
 from sitemanager.notifications.mail import Mailer, render_template
 from sitemanager.status.monitoring import check_https_status, print_https_status_list
 from sitemanager.status.models import SiteStatus, StatusLogEntry, StatusLogType
@@ -131,11 +131,6 @@ class Commands:
     class backup_apps(CommandBase):
         """Backs up apps to Amazon S3"""
 
-        BACKUP_FUNCTIONS = {
-            "wordpress": backup_wordpress_site,
-            "drupal": backup_drupal_site,
-        }
-
         def execute(self):
             sites = self.db_session.query(Site).join(SiteSSHConfig).filter(
                 Site.is_active,
@@ -144,11 +139,12 @@ class Commands:
             for site in sites:
                 logging.debug(f"started backup: {site.app}, {site.host}")
                 start_at = perf_counter()
-                self.BACKUP_FUNCTIONS[site.app](
+                backup_app(
+                    site.app,
                     site.id,
                     site.host,
                     site.ssh_config.to_dict(),
-                    "sitebackup-" + site.host,
+                    self.config["backup"],
                     self.config["aws"])
                 duration = (perf_counter() - start_at) * 1000
                 logging.info(f"{site.app} {site.host}, ({int(duration)}ms)")

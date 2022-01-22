@@ -1,3 +1,5 @@
+
+from abc import ABC
 from requests.sessions import Session
 import urllib3
 import requests
@@ -12,7 +14,7 @@ class RemoteCommandError(BaseException):
     pass
 
 
-class RemoteClient:
+class RemoteClient(ABC):
 
     def __init__(self, config):
         self.config = config
