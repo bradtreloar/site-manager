@@ -29,9 +29,9 @@ class CommandTests(TestCase):
         """
         Commands.help(mock_config, None).execute()
         expected_output = [
-            "",
+            r"",
             r"Available commands:",
-            "",
+            r"",
         ] + [re.compile(f"{command.__name__}") for command in commands()]
         output = mock_stdout.getvalue().split("\n")
         for index, pattern in enumerate(expected_output):
