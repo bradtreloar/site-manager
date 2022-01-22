@@ -5,19 +5,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from sitemanager.commands import Commands, commands
-
-
-mock_config = {
-    "mail": {
-        "to": "recipient@example.com",
-        "from": "sender@example.com",
-        "host": "smtp.example.com",
-        "port": "2525",
-        "username": "example_username",
-        "password": "example_password",
-        "use_tls": "False",
-    }
-}
+from tests.fakes import fake_config
 
 
 class CommandTests(TestCase):
@@ -27,7 +15,7 @@ class CommandTests(TestCase):
         """
         Prints a list of available commands to the screen.
         """
-        Commands.help(mock_config, None).execute()
+        Commands.help(fake_config(), None).execute()
         expected_output = [
             r"",
             r"Available commands:",

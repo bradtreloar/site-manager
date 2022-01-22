@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Boolean, Integer, String
 
-from sitemanager.database import Model
+from sitemanager.database import BaseModel
 
 
 def import_sites(sites_config, webauth_config, db_session):
@@ -45,7 +45,7 @@ def import_sites(sites_config, webauth_config, db_session):
     db_session.commit()
 
 
-class Site(Model):
+class Site(BaseModel):
     __tablename__ = "sites"
 
     id = Column(Integer, primary_key=True)
@@ -57,7 +57,7 @@ class Site(Model):
         return f"<Site(site='{self.host}')>"
 
 
-class SiteSSHConfig(Model):
+class SiteSSHConfig(BaseModel):
     __tablename__ = "site_ssh_configs"
 
     id = Column(Integer, primary_key=True)

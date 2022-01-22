@@ -1,6 +1,7 @@
 
 from random import randint, choice as random_choice
 import string
+from unittest import TestCase
 
 from sitemanager.sites import Site, SiteSSHConfig
 
@@ -8,6 +9,44 @@ from sitemanager.sites import Site, SiteSSHConfig
 def random_string(length):
     return "".join(
         [random_choice(string.ascii_uppercase) for _ in range(length)])
+
+
+def fake_config(config={}):
+    default_config = {
+        "database": {
+            "path": ":memory:",
+        },
+        "sites": {
+            "example1.com": {},
+            "example2.com": {
+                "app": "wordpress",
+                "ssh": {
+                    "user": "example2user",
+                }
+            },
+            "example3.com": {
+                "app": "wordpress",
+                "ssh": {
+                    "user": "example3user",
+                    "host": "ssh.example3.com",
+                    "port": "21212",
+                    "key_filename": "/path/to/key_filename",
+                }
+            }
+        },
+        "mail": {
+            "to": "recipient@example.com",
+            "from": "sender@example.com",
+            "host": "smtp.example.com",
+            "port": "2525",
+            "username": "example_username",
+            "password": "example_password",
+            "use_tls": "False",
+        },
+        "webauth": {}
+    }
+    default_config.update(config)
+    return default_config
 
 
 def fake_host():

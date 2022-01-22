@@ -4,7 +4,7 @@ from sqlalchemy import (
     Column, UniqueConstraint,
     Date, DateTime, Enum, ForeignKey, Numeric, Integer, String)
 from sqlalchemy.orm import relationship
-from sitemanager.database import Model
+from sitemanager.database import BaseModel
 from sitemanager.sites import Site
 
 
@@ -19,7 +19,7 @@ class SiteStatus(enum.Enum):
     UNKNOWN = "unknown"
 
 
-class StatusLogEntry(Model):
+class StatusLogEntry(BaseModel):
     __tablename__ = "status_log_entries"
 
     id = Column(Integer, primary_key=True)

@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-Model = declarative_base()
+BaseModel = declarative_base()
 
 
 def get_db_session(config):
@@ -16,6 +16,6 @@ def get_db_session(config):
     if filepath != ":memory:":
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
     db = create_engine(f"sqlite+pysqlite:///{filepath}")
-    Model.metadata.create_all(db)
+    BaseModel.metadata.create_all(db)
     session = sessionmaker(bind=db)()
     return session
