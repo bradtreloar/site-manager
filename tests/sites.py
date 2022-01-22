@@ -74,7 +74,7 @@ def seed_database(db_session, site_count):
     db_session.commit()
 
 
-class CommandTests(TestCase):
+class SiteTests(TestCase):
 
     def test_import_sites(self):
         """
