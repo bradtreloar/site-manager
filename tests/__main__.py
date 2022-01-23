@@ -4,7 +4,8 @@ import unittest
 from tests.backup import BackupTests
 from tests.commands import CommandTests
 from tests.config import ConfigTests
-from tests.notifications import MailerTests, TemplateTests
+from tests.mail import MailerTests
+from tests.notifications import TemplateTests
 from tests.sites import SiteTests
 
 
