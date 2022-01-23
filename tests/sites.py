@@ -2,7 +2,8 @@
 from unittest import TestCase
 
 from sitemanager.database import BaseModel, get_db_session
-from sitemanager.sites import import_sites, Site, SiteSSHConfig
+from sitemanager.sites import import_sites
+from sitemanager.models import Site, SiteSSHConfig
 from tests import TestCaseWithDatabase
 from tests.fakes import fake_config, fake_site, fake_site_ssh_config
 

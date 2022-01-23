@@ -5,12 +5,12 @@ import logging
 from time import perf_counter
 
 from sitemanager.backup import backup_app
+from sitemanager.enums import SiteStatus, StatusLogType
 from sitemanager.mail import Mailer
+from sitemanager.models import Site, SiteSSHConfig, StatusLogEntry
 from sitemanager.templates.render import render_template
-from sitemanager.status.monitoring import (
+from sitemanager.monitoring import (
     check_https_status, print_https_status_list)
-from sitemanager.status.models import SiteStatus, StatusLogEntry, StatusLogType
-from sitemanager.sites import Site, SiteSSHConfig
 
 
 class CommandBase:

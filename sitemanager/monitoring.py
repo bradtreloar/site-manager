@@ -3,7 +3,7 @@ import aiohttp
 from datetime import datetime
 from termcolor import colored
 
-from sitemanager.status.models import SiteStatus
+from sitemanager.models import SiteStatus
 
 
 STATUS_COLORS = {
