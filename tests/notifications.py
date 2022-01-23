@@ -66,6 +66,9 @@ class MailerTests(TestCaseWithConfig):
         mock_smtp.login.assert_called()
         mock_smtp.sendmail.assert_called()
 
+
+class TemplateTests(TestCase):
+
     @patch('builtins.open')
     @patch('os.path.exists')
     def test_load_template(self, mock_os_path_exists, mock_open):
