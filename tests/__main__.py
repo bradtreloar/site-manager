@@ -1,13 +1,20 @@
 
 import unittest
 
+from tests.backup import BackupTests
 from tests.commands import CommandTests
+from tests.config import ConfigTests
+from tests.notifications import MailerTests, TemplateTests
 from tests.sites import SiteTests
 
 
 TESTCASES = {
+    BackupTests,
     CommandTests,
-    SiteTests
+    ConfigTests,
+    MailerTests,
+    SiteTests,
+    TemplateTests
 }
 
 
