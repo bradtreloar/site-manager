@@ -46,7 +46,7 @@ class MailerTests(TestCaseWithConfig):
 
     @patch('ssl.create_default_context', autospec=True)
     @patch('smtplib.SMTP_SSL', autospec=True)
-    def test_notify_without_tls(
+    def test_notify_with_tls(
             self, mock_SMTP_SSL, mock_create_default_context):
         """
         Sends message over encrypted connection.
