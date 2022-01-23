@@ -28,7 +28,8 @@ class Mailer:
         message.attach(MIMEText(message_body, "html"))
         if self.use_tls:
             context = ssl.create_default_context()
-            with smtplib.SMTP_SSL(host=self.host, port=self.port, context=context) as smtp:
+            with smtplib.SMTP_SSL(
+                    host=self.host, port=self.port, context=context) as smtp:
                 smtp.login(self.username, self.password)
                 smtp.sendmail(
                     self.mail_from, self.mail_to, message.as_string()
