@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import shutil
 
@@ -33,7 +33,7 @@ def backup_app(site, backup_config, aws_config=None):
     # Create backup tarball.
     archive_dirpath = TEMP_ARCHIVE_DIR_TEMPLATE.format(site.host)
     archive_filename = (
-        f"{site.app}_backup_{datetime.utcnow().isoformat(timespec='seconds')}"
+        f"{site.app}_backup_{datetime.now(timezone.utc).isoformat(timespec='seconds')}"
         f".tar.gz")
     archive_filepath = f"{archive_dirpath}/{archive_filename}"
     make_backup_archive(archive_filepath, backups_dirpath)

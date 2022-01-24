@@ -1,6 +1,6 @@
 
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 from time import perf_counter
 
@@ -65,7 +65,7 @@ class Commands:
                         site=result["site"],
                         type=StatusLogType.HTTPS,
                         status=result["status"],
-                        created=datetime.now(),
+                        created=datetime.now(timezone.utc),
                     )
                     self.db_session.add(status_log_entry)
                 if result["notify"]:
@@ -122,7 +122,7 @@ class Commands:
                         "site_host": site.host,
                         "status_value": entry.status.value,
                         "status_color": status_colors[entry.status],
-                        "status_duration": datetime.now() - entry.created,
+                        "status_duration": datetime.now(timezone.utc) - entry.created,
                     }
 
             message_body = render_template("status.status_report", {

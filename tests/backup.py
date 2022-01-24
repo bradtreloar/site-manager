@@ -35,7 +35,7 @@ class BackupTests(TestCase):
         Stores a backup of an app on a local filesystem.
         """
         fake_datetime = datetime(2020, 1, 1)
-        mock_datetime.utcnow.return_value = fake_datetime
+        mock_datetime.now.return_value = fake_datetime
         fake_dirpath = random_string(20)
         site = fake_site()
         site.app = "wordpress"
@@ -88,7 +88,7 @@ class BackupTests(TestCase):
         Stores a backup of an app on an S3 bucket.
         """
         frozen_datetime = datetime(2020, 1, 1)
-        mock_datetime.utcnow.return_value = frozen_datetime
+        mock_datetime.now.return_value = frozen_datetime
         bucket_name = random_string(20)
         aws_config = fake_aws_config()
         site = fake_site()

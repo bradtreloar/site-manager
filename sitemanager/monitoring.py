@@ -1,6 +1,6 @@
 
 import aiohttp
-from datetime import datetime
+from datetime import datetime, timezone
 from termcolor import colored
 
 from sitemanager.models import SiteStatus
@@ -21,18 +21,18 @@ async def check_https_status(site_info):
     prev_status = site_info["site_latest_status"]
     status = SiteStatus.UNKNOWN
     duration = None
-    request_time = datetime.now()
+    request_time = datetime.now(timezone.utc)
     attempts = 0
     while attempts < 2 and status != SiteStatus.UP:
         try:
-            start_at = datetime.now()
+            start_at = datetime.now(timezone.utc)
             url = site_info["site_url"]
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as response:
                     status_code = response.status
                     if status_code != 200:
                         raise UnexpectedResponseException(status_code)
-            end_at = datetime.now()
+            end_at = datetime.now(timezone.utc)
             duration = end_at - start_at
             request_time = start_at
             status = SiteStatus.UP
@@ -58,7 +58,7 @@ def print_https_status_list(sites):
     for site in sites:
         status = site.latest_status
         try:
-            status_age = (datetime.now() -
+            status_age = (datetime.now(timezone.utc) -
                           site.latest_status_log_entry.created)
         except AttributeError:
             status_age = ""
