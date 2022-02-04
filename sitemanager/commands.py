@@ -36,6 +36,17 @@ class CommandBase:
         logging.info(
             f"Command complete: {command_name} ({duration}ms)")
 
+    def get_active_sites(self):
+        return self.db_session.query(Site).filter(
+            Site.is_active
+        ).all()
+
+    def get_active_app_sites_with_ssh_config(self):
+        return self.db_session.query(Site).join(SiteSSHConfig).filter(
+            Site.is_active,
+            Site.app is not None
+        ).all()
+
     @classmethod
     def name(cls):
         return cls.__name__
@@ -67,9 +78,7 @@ class Commands:
         """
 
         def execute(self):
-            sites = self.db_session.query(Site).filter(
-                Site.is_active
-            ).all()
+            sites = self.get_active_sites()
 
             async def get_results():
                 results = []
@@ -123,18 +132,14 @@ class Commands:
         """Displays most recent status of each website."""
 
         def execute(self):
-            sites = self.db_session.query(Site).filter(
-                Site.is_active
-            ).all()
+            sites = self.get_active_sites()
             print_https_status_list(sites)
 
     class send_status_report(CommandBase):
         """Sends email report listing website status details."""
 
         def execute(self):
-            sites = self.db_session.query(Site).filter(
-                Site.is_active
-            ).all()
+            sites = self.get_active_sites()
             status_colors = {
                 SiteStatus.UP: ("white", "green"),
                 SiteStatus.DOWN: ("white", "red"),
@@ -160,10 +165,7 @@ class Commands:
         """Backs up apps to Amazon S3"""
 
         def execute(self):
-            sites = self.db_session.query(Site).join(SiteSSHConfig).filter(
-                Site.is_active,
-                Site.app is not None
-            ).all()
+            sites = self.get_active_app_sites_with_ssh_config()
             for site in sites:
                 logging.debug(f"started backup: {site.app}, {site.host}")
                 start_at = perf_counter()
