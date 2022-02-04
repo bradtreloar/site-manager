@@ -1,32 +1,73 @@
 
 import os
+from typing import Dict, TypedDict
 import yaml
 
 
-DEFAULT_CONFIG = {
-    "scheduler": {
-        "data": "./data.yml",
-    },
-}
+class AWSConfig(TypedDict):
+    region: str
+    aws_access_key_id: str
+    aws_secret_access_key: str
 
 
-def load_config(filepath):
-    """
-    Load config, falling back to default values where possible.
+class BackupConfig(TypedDict):
+    filesystem: str
+    path: str
+    bucket: str
 
-    Params:
-        filepath: the path to the config YAML file.
 
-    Returns:
-        The config dictionary.
-    """
+class DatabaseConfig(TypedDict):
+    path: str
 
-    # Create a new config from defaults.
-    config = dict(DEFAULT_CONFIG)
 
-    # Overwrite defaults with values from config file.
+class LoggingConfig(TypedDict):
+    path: str
+
+
+class MailConfig(TypedDict):
+    mail_to: str
+    mail_from: str
+    host: str
+    port: int
+    username: str
+    password: str
+    use_tls: bool
+
+
+class MailserviceConfig(TypedDict):
+    host: str
+    access_key: str
+
+
+class SiteSSHConfig(TypedDict):
+    host: str
+    port: int
+    user: str
+
+
+class SiteConfig(TypedDict):
+    app: str
+    ssh: SiteSSHConfig
+
+
+class WebAuthItemConfig(TypedDict):
+    login_url: str
+    webauth_url: str
+    username: str
+    password: str
+
+
+class Config(TypedDict):
+    aws: AWSConfig
+    backup: BackupConfig
+    database: DatabaseConfig
+    logging: LoggingConfig
+    mail: MailConfig
+    mailservice: MailserviceConfig
+    sites: Dict[str, SiteConfig]
+    webauth: Dict[str, WebAuthItemConfig]
+
+
+def load_config(filepath: str) -> Config:
     with open(filepath) as file:
-        config.update(yaml.safe_load(file))
-
-    # Return the merged config.
-    return config
+        return yaml.safe_load(file)
