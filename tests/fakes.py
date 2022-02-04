@@ -1,13 +1,20 @@
 
+from datetime import datetime
 from random import randint, choice as random_choice
 import string
 
+from sitemanager.enums import SiteStatus, StatusLogType
+from sitemanager.models import StatusLogEntry
 from sitemanager.sites import Site, SiteSSHConfig
 
 
 def random_string(length):
     return "".join(
         [random_choice(string.ascii_uppercase) for _ in range(length)])
+
+
+def random_datetime(min=0, max=2000000000):
+    return datetime.fromtimestamp(float(randint(min, max)))
 
 
 def fake_config(config={}):
@@ -75,3 +82,11 @@ def fake_site_ssh_config(site, values={}):
         host=values.get("host", fake_host()),
         port=values.get("port", 22),
         user=values.get("user", random_string(20)))
+
+
+def fake_status_log_entry(site, values={}):
+    return StatusLogEntry(
+        site=site,
+        type=values.get("type", StatusLogType.HTTPS),
+        status=values.get("status", SiteStatus.UP),
+        created=values.get("created", random_datetime()))
