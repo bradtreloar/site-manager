@@ -72,7 +72,7 @@ class BackupTests(TestCase):
 
     @patch("os.makedirs")
     @patch("shutil.rmtree")
-    @patch("sitemanager.backup.S3BackupBucketClient")
+    @patch("sitemanager.backup.S3BucketClient")
     @patch("sitemanager.backup.datetime", wraps=datetime)
     @patch("sitemanager.backup.make_gzipped_tarball")
     @patch("sitemanager.backup.get_remote_client")

@@ -3,7 +3,7 @@ import os
 import boto3
 
 
-class S3BackupBucketClient:
+class S3BucketClient:
 
     def __init__(self, config, backup_bucket):
         self.region = config["region"]
