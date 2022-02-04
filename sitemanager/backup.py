@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import os
 import shutil
 
-from sitemanager.archive import make_backup_archive
+from sitemanager.archive import make_gzipped_tarball
 from sitemanager.aws import S3BackupBucketClient
 from sitemanager.remote import get_remote_client
 from sitemanager.remote.wordpress import WordpressClient
@@ -36,7 +36,7 @@ def backup_app(site, backup_config, aws_config=None):
         f"{site.app}_backup_{datetime.now(timezone.utc).isoformat(timespec='seconds')}"
         f".tar.gz")
     archive_filepath = f"{archive_dirpath}/{archive_filename}"
-    make_backup_archive(archive_filepath, backups_dirpath)
+    make_gzipped_tarball(archive_filepath, backups_dirpath)
 
     if backup_config["filesystem"].lower() == "s3":
         # Upload tarball to S3.

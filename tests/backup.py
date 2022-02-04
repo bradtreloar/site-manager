@@ -21,12 +21,12 @@ class BackupTests(TestCase):
     @patch("shutil.copy")
     @patch("os.makedirs")
     @patch("sitemanager.backup.datetime", wraps=datetime)
-    @patch("sitemanager.backup.make_backup_archive")
+    @patch("sitemanager.backup.make_gzipped_tarball")
     @patch("sitemanager.backup.get_remote_client")
     def test_backup_app_to_local(
             self,
             mock_get_remote_client,
-            mock_make_backup_archive,
+            mock_make_gzipped_tarball,
             mock_datetime,
             mock_os_makedirs,
             mock_shutil_copy,
@@ -63,7 +63,7 @@ class BackupTests(TestCase):
             backups_dirpath)
         mock_remote_client_instance.download_generated_files.assert_called_with(
             backups_dirpath)
-        mock_make_backup_archive.assert_called_with(
+        mock_make_gzipped_tarball.assert_called_with(
             archive_filepath, backups_dirpath)
         mock_os_makedirs.assert_called_with(fake_dirpath, exist_ok=True)
         mock_shutil_copy.assert_called_with(archive_filepath, os.path.join(
@@ -74,12 +74,12 @@ class BackupTests(TestCase):
     @patch("shutil.rmtree")
     @patch("sitemanager.backup.S3BackupBucketClient")
     @patch("sitemanager.backup.datetime", wraps=datetime)
-    @patch("sitemanager.backup.make_backup_archive")
+    @patch("sitemanager.backup.make_gzipped_tarball")
     @patch("sitemanager.backup.get_remote_client")
     def test_backup_app_to_s3(
             self,
             mock_get_remote_client,
-            mock_make_backup_archive,
+            mock_make_gzipped_tarball,
             mock_datetime,
             mock_s3_backup_client_class,
             mock_shutil_rmtree,
@@ -119,7 +119,7 @@ class BackupTests(TestCase):
             backups_dirpath)
         mock_remote_client.download_generated_files.assert_called_with(
             backups_dirpath)
-        mock_make_backup_archive.assert_called_with(
+        mock_make_gzipped_tarball.assert_called_with(
             archive_filepath, backups_dirpath)
         mock_os_makedirs.assert_not_called()
         mock_s3_backup_client_class.assert_called_with(
