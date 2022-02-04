@@ -1,6 +1,7 @@
 
 import unittest
 
+from tests.archive import ArchiveTests
 from tests.backup import BackupTests
 from tests.commands import CommandTests
 from tests.config import ConfigTests
@@ -11,6 +12,7 @@ from tests.sites import SiteTests
 
 
 TESTCASES = {
+    ArchiveTests,
     BackupTests,
     CommandTests,
     ConfigTests,
