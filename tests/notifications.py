@@ -11,8 +11,8 @@ from tests.fakes import random_string
 
 class TemplateTests(TestCase):
 
-    @patch('builtins.open')
-    @patch('os.path.exists')
+    @patch("builtins.open")
+    @patch("os.path.exists")
     def test_load_template(self, mock_os_path_exists, mock_open):
         """
         Reads the contents of a template file given the template name.
@@ -50,7 +50,7 @@ class TemplateTests(TestCase):
             mock_open.assert_called_with(template_path)
             self.assertEqual(result, mock_file.read.return_value)
 
-    @patch('sitemanager.templates.render.Environment')
+    @patch("sitemanager.templates.render.Environment")
     def test_render_template(self, mock_Environment):
         """
         Loads and renders template with given data.
