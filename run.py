@@ -49,7 +49,7 @@ def get_config(filepath: PathLike):
         return yaml.safe_load(file)
 
 
-def normalize_command_name(command_name):
+def normalize_command_name(command_name: str):
     return command_name.replace("-", "_")
 
 
