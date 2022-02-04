@@ -5,9 +5,11 @@ import logging
 from time import perf_counter
 
 from sitemanager.backup import backup_app
+from sitemanager.database import get_db_session
 from sitemanager.enums import SiteStatus, StatusLogType
 from sitemanager.mail import Mailer
 from sitemanager.models import Site, SiteSSHConfig, StatusLogEntry
+from sitemanager.sites import import_sites
 from sitemanager.templates.render import render_template
 from sitemanager.monitoring import (
     check_https_status, print_https_status_list)
@@ -15,30 +17,54 @@ from sitemanager.monitoring import (
 
 class CommandBase:
 
-    def __init__(self, config, db_session):
+    def __init__(self, config):
         self.config = config
-        self.db_session = db_session
+        self.db_session = get_db_session(config["database"])
         self.mailer = Mailer(config["mail"])
 
     def __call__(self):
+        command_name = self.__class__.__name__
+        print(f"=> {command_name}")
+        logging.info(f"Command started: {command_name}")
+        start_time = perf_counter()
+        import_sites(
+            self.config["sites"],
+            self.config["webauth"],
+            self.db_session)
         self.execute()
+        duration = int((perf_counter() - start_time) * 1000)
+        logging.info(
+            f"Command complete: {command_name} ({duration}ms)")
+
+    @classmethod
+    def name(cls):
+        return cls.__name__
+
+    @classmethod
+    def description(cls):
+        return " ".join(cls.__doc__.strip("\n").strip().split())
 
 
 class Commands:
 
     class help(CommandBase):
-        """Displays help text."""
+        """
+        Displays help text.
+        """
 
         def execute(self):
             print()
             print("Available commands:")
             print()
             for command in commands():
-                print(f"{command.__name__:<24}{command.__doc__}")
+                print(f"{command.name():<24}{command.description()}")
             print()
 
     class update_https_status(CommandBase):
-        """Checks status of each website and notifies sysadmin when a website is down or inaccessible."""
+        """
+        Checks status of each website and notifies sysadmin when a website is 
+        down or inaccessible.
+        """
 
         def execute(self):
             sites = self.db_session.query(Site).filter(
@@ -163,3 +189,11 @@ def get_command(command_name):
     for command in commands():
         if command_name == command.__name__:
             return command
+
+
+def configure_logging(filepath, show_debug_logs=False):
+    logging_level = logging.DEBUG if show_debug_logs else logging.INFO
+    logging.basicConfig(
+        filename=filepath,
+        format="%(asctime)s %(levelname)s: %(message)s",
+        level=logging_level)

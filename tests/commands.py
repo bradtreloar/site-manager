@@ -10,12 +10,12 @@ from tests.fakes import fake_config
 
 class CommandTests(TestCase):
 
-    @patch('sys.stdout', new_callable=io.StringIO)
+    @patch("sys.stdout", new_callable=io.StringIO)
     def test_help_command(self, mock_stdout):
         """
         Prints a list of available commands to the screen.
         """
-        Commands.help(fake_config(), None).execute()
+        Commands.help(fake_config()).execute()
         expected_output = [
             r"",
             r"Available commands:",
