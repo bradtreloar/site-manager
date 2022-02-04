@@ -1,9 +1,9 @@
 
-import aiohttp
+from httpx import AsyncClient
 from datetime import datetime, timezone
 from termcolor import colored
 
-from sitemanager.models import SiteStatus
+from sitemanager.models import Site, SiteStatus
 
 
 STATUS_COLORS = {
@@ -17,8 +17,8 @@ class UnexpectedResponseException(BaseException):
     pass
 
 
-async def check_https_status(site_info):
-    prev_status = site_info["site_latest_status"]
+async def check_https_status(site: Site):
+    prev_status = site.latest_status
     status = SiteStatus.UNKNOWN
     duration = None
     request_time = datetime.now(timezone.utc)
@@ -26,12 +26,12 @@ async def check_https_status(site_info):
     while attempts < 2 and status != SiteStatus.UP:
         try:
             start_at = datetime.now(timezone.utc)
-            url = site_info["site_url"]
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
-                    status_code = response.status
-                    if status_code != 200:
-                        raise UnexpectedResponseException(status_code)
+            url = f"https://{site.host}"
+            async with AsyncClient() as client:
+                response = await client.get(url)
+                status_code = response.status_code
+                if status_code != 200:
+                    raise UnexpectedResponseException(status_code)
             end_at = datetime.now(timezone.utc)
             duration = end_at - start_at
             request_time = start_at
@@ -44,7 +44,7 @@ async def check_https_status(site_info):
     status_changed = status != prev_status
     ignore_status_change = prev_status == SiteStatus.UNKNOWN and status == SiteStatus.UP
     return {
-        **site_info,
+        "site": site,
         "duration": duration,
         "request_time": request_time,
         "status": status,

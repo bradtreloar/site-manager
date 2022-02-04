@@ -83,12 +83,7 @@ class Commands:
             async def get_results():
                 results = []
                 for site in sites:
-                    result = await check_https_status({
-                        "site_id": site.id,
-                        "site_url": "https://" + site.host,
-                        "site_latest_status": site.latest_status,
-                    })
-                    result["site"] = site
+                    result = await check_https_status(site)
                     results.append(result)
                 return results
 

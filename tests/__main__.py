@@ -5,7 +5,7 @@ from tests.backup import BackupTests
 from tests.commands import CommandTests
 from tests.config import ConfigTests
 from tests.mail import MailerTests
-from tests.monitoring import MonitoringTests
+from tests.monitoring import MonitoringTests, AsyncMonitoringTests
 from tests.notifications import TemplateTests
 from tests.sites import SiteTests
 
@@ -16,6 +16,7 @@ TESTCASES = {
     ConfigTests,
     MailerTests,
     MonitoringTests,
+    AsyncMonitoringTests,
     SiteTests,
     TemplateTests
 }
