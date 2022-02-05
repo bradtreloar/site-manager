@@ -8,7 +8,7 @@ from sitemanager.backup import backup_app
 from sitemanager.database import get_db_session
 from sitemanager.enums import SiteStatus, StatusLogType
 from sitemanager.mail import Mailer
-from sitemanager.models import Site, SiteSSHConfig, StatusLogEntry
+from sitemanager.models import Site, SiteSSH, StatusLogEntry
 from sitemanager.sites import import_sites
 from sitemanager.templates.render import render_template
 from sitemanager.monitoring import (
@@ -42,7 +42,7 @@ class CommandBase:
         ).all()
 
     def get_active_app_sites_with_ssh_config(self):
-        return self.db_session.query(Site).join(SiteSSHConfig).filter(
+        return self.db_session.query(Site).join(SiteSSH).filter(
             Site.is_active,
             Site.app is not None
         ).all()
@@ -114,7 +114,7 @@ class Commands:
                     ("Request time", result["request_time"]),
                 ]
             }
-            if "error" in result.keys():
+            if "error" in result:
                 data["status_details"].append(("Error", result["error"]))
             message_subject = "{status}: {host}".format(
                 status=result["status"].value.upper(),

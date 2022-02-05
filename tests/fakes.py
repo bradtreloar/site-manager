@@ -5,7 +5,7 @@ import string
 
 from sitemanager.enums import SiteStatus, StatusLogType
 from sitemanager.models import StatusLogEntry
-from sitemanager.sites import Site, SiteSSHConfig
+from sitemanager.sites import Site, SiteSSH
 
 
 def random_string(length):
@@ -76,8 +76,8 @@ def fake_site(values={}):
         is_active=values.get("is_active", True))
 
 
-def fake_site_ssh_config(site, values={}):
-    return SiteSSHConfig(
+def fake_site_ssh(site, values={}):
+    return SiteSSH(
         site=site,
         host=values.get("host", fake_host()),
         port=values.get("port", 22),

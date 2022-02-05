@@ -11,7 +11,7 @@ from sitemanager.backup import (
 from tests.fakes import (
     fake_aws_config,
     fake_site,
-    fake_site_ssh_config,
+    fake_site_ssh,
     random_string)
 
 
@@ -39,7 +39,7 @@ class BackupTests(TestCase):
         fake_dirpath = random_string(20)
         site = fake_site()
         site.app = "wordpress"
-        site.ssh_config = fake_site_ssh_config(site)
+        site.ssh_config = fake_site_ssh(site)
         backups_dirpath = TEMP_BACKUPS_DIR_TEMPLATE.format(site.host)
         archive_dirpath = TEMP_ARCHIVE_DIR_TEMPLATE.format(site.host)
         archive_filename = (
@@ -93,7 +93,7 @@ class BackupTests(TestCase):
         aws_config = fake_aws_config()
         site = fake_site()
         site.app = "wordpress"
-        site.ssh_config = fake_site_ssh_config(site)
+        site.ssh_config = fake_site_ssh(site)
         backups_dirpath = TEMP_BACKUPS_DIR_TEMPLATE.format(site.host)
         archive_dirpath = TEMP_ARCHIVE_DIR_TEMPLATE.format(site.host)
         archive_filename = (

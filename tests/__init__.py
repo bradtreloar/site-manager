@@ -2,8 +2,8 @@
 from unittest import TestCase
 
 from sitemanager.database import BaseModel, get_db_session
-from sitemanager.sites import import_sites, Site, SiteSSHConfig
-from tests.fakes import fake_config, fake_site, fake_site_ssh_config
+from sitemanager.sites import import_sites, Site, SiteSSH
+from tests.fakes import fake_config, fake_site, fake_site_ssh
 
 
 class TestCaseWithConfig(TestCase):
@@ -17,7 +17,7 @@ class TestCaseWithDatabase(TestCaseWithConfig):
 
     def setUp(self):
         super().setUp()
-        self.session = get_db_session(self.config["database"])
+        self.db_session = get_db_session(self.config["database"])
 
     def tearDown(self):
         self.clear_database()
@@ -30,13 +30,13 @@ class TestCaseWithDatabase(TestCaseWithConfig):
             The list of records to add.
         """
         for record in records:
-            self.session.add(record)
-        self.session.commit()
+            self.db_session.add(record)
+        self.db_session.commit()
 
     def clear_database(self):
         """
         Remove all records from the database.
         """
         for tbl in reversed(BaseModel.metadata.sorted_tables):
-            self.session.execute(tbl.delete())
-        self.session.commit()
+            self.db_session.execute(tbl.delete())
+        self.db_session.commit()

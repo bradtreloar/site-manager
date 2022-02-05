@@ -3,36 +3,84 @@ from unittest import TestCase
 
 from sitemanager.database import BaseModel, get_db_session
 from sitemanager.sites import import_sites
-from sitemanager.models import Site, SiteSSHConfig
+from sitemanager.models import Site, SiteSSH
 from tests import TestCaseWithDatabase
-from tests.fakes import fake_config, fake_site, fake_site_ssh_config
+from tests.fakes import fake_config, fake_site, fake_site_ssh, random_string
 
 
 class SiteTests(TestCaseWithDatabase):
 
-    def test_import_sites(self):
+    def test_imports_site_from_config(self):
         """
-        Imports sites and site SSH configs from a config dictionary.
+        Imports Site from config.
         """
-        import_sites(self.config["sites"],
-                     self.config["webauth"], self.session)
-        self.assertEqual(len(self.session.query(Site).all()),
-                         len(self.config["sites"]))
-        self.assertGreater(len(self.session.query(SiteSSHConfig).all()), 0)
+        site = fake_site()
+        sites_config = {
+            site.host: {}
+        }
+        webauth_config = {}
+        import_sites(sites_config, webauth_config, self.db_session)
+        sites = self.db_session.query(Site).all()
+        self.assertEqual(sites[0].host, site.host)
 
-    def test_import_sites_with_existing(self):
+    def test_activates_site_from_config(self):
         """
-        Imports sites and site SSH configs from a config dictionary, and marks
-        existing sites as inactive if they do not appear in the config.
+        Sets existing Site as active when imported from config.
         """
-        seeded_site = fake_site()
-        seeded_site_ssh_config = fake_site_ssh_config(seeded_site)
-        self.seed([seeded_site, seeded_site_ssh_config])
-        self.assertEqual(len(self.session.query(Site).all()), 1)
-        import_sites(self.config["sites"],
-                     self.config["webauth"], self.session)
-        sites = self.session.query(Site).all()
-        self.assertEqual(len(sites), len(self.config["sites"]) + 1)
+        site = fake_site({
+            "is_active": False,
+        })
+        self.seed([
+            site
+        ])
+        sites_config = {
+            site.host: {}
+        }
+        webauth_config = {}
+        self.assertFalse(site.is_active)
+        import_sites(sites_config, webauth_config, self.db_session)
+        sites = self.db_session.query(Site).all()
+        self.assertEqual(sites[0].host, site.host)
+        self.assertTrue(sites[0].is_active)
+
+    def test_deactivates_site_missing_from_config(self):
+        """
+        Sets existing Site as inactive when missing from imported config.
+        """
+        site = fake_site({
+            "is_active": True,
+        })
+        self.seed([
+            site
+        ])
+        sites_config = {}
+        webauth_config = {}
+        self.assertTrue(site.is_active)
+        import_sites(sites_config, webauth_config, self.db_session)
+        sites = self.db_session.query(Site).all()
+        self.assertEqual(sites[0].host, site.host)
         self.assertFalse(sites[0].is_active)
-        for i in range(1, len(sites)):
-            self.assertTrue(sites[i].is_active)
+
+    def test_imports_ssh_config_from_config(self):
+        """
+        Imports SiteSSHConfig from config.
+        """
+        site = fake_site()
+        ssh_config = fake_site_ssh(site)
+        sites_config = {
+            site.host: {
+                "ssh": {
+                    "host": ssh_config.host,
+                    "port": ssh_config.port,
+                    "user": ssh_config.user,
+                    "key_filename": ssh_config.key_filename,
+                },
+            }
+        }
+        webauth_config = {}
+        import_sites(sites_config, webauth_config, self.db_session)
+        ssh_configs = self.db_session.query(SiteSSH).all()
+        self.assertEqual(ssh_configs[0].host, ssh_config.host)
+        self.assertEqual(ssh_configs[0].port, ssh_config.port)
+        self.assertEqual(ssh_configs[0].user, ssh_config.user)
+        self.assertEqual(ssh_configs[0].key_filename, ssh_config.key_filename)

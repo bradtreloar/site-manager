@@ -33,7 +33,7 @@ class Site(BaseModel):
         return f"<Site(site='{self.host}')>"
 
 
-class SiteSSHConfig(BaseModel):
+class SiteSSH(BaseModel):
     __tablename__ = "site_ssh_configs"
 
     id = Column(Integer, primary_key=True)
@@ -60,7 +60,7 @@ class SiteSSHConfig(BaseModel):
         }
 
 
-Site.ssh_config = relationship(SiteSSHConfig,
+Site.ssh_config = relationship(SiteSSH,
                                uselist=False,
                                back_populates="site",
                                cascade="all, delete")
