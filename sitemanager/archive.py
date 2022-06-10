@@ -1,9 +1,8 @@
 import os
-from os import PathLike
 import tarfile
 
 
-def make_gzipped_tarball(dest_filepath: PathLike, src_dir: PathLike):
+def make_gzipped_tarball(dest_filepath: str, src_dir: str):
     # Make sure destination directory exists.
     os.makedirs(os.path.dirname(dest_filepath), exist_ok=True)
 

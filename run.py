@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 import logging
-from os import PathLike
 import sys
 from time import perf_counter
 import yaml
@@ -44,7 +43,7 @@ def get_commandline_args():
     return parser.parse_args()
 
 
-def get_config(filepath: PathLike):
+def get_config(filepath: str):PathLike
     with open(filepath) as file:
         return yaml.safe_load(file)
 
