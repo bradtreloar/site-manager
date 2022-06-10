@@ -10,7 +10,11 @@ class ArchiveTests(TestCase):
     @patch("os.listdir")
     @patch("os.path")
     @patch("os.makedirs")
-    def test_make_gzipped_tarball(self, mock_makedirs, mock_path, mock_listdir):
+    def test_adds_files_to_gzipped_tarball(
+            self, mock_makedirs, mock_path, mock_listdir):
+        """
+        Adds all files in a directory to a gzipped tarball.
+        """
         dest_filepath = random_string(20)
         src_dirpath = random_string(20)
         src_filenames = [
