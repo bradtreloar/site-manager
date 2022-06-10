@@ -1,6 +1,7 @@
 
 import os
 from unittest import TestCase
+import unittest
 from unittest.mock import MagicMock, patch
 
 import sitemanager
@@ -68,3 +69,7 @@ class TemplateTests(TestCase):
         self.assertEqual(result, mock_template.render.return_value)
         mock_environment.get_template.assert_called_with(template_name)
         mock_template.render.assert_called_with(**data)
+
+
+if __name__ == "__main__":
+    unittest.main()

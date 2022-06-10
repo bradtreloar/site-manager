@@ -1,5 +1,6 @@
 
 from unittest import TestCase
+import unittest
 from unittest.mock import patch, mock_open
 import yaml
 
@@ -21,3 +22,7 @@ class ConfigTests(TestCase):
             result = load_config(fake_filepath)
             mk_open.assert_called_with(fake_filepath)
         self.assertDictEqual(result, mock_config)
+
+
+if __name__ == "__main__":
+    unittest.main()

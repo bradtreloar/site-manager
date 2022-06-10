@@ -2,6 +2,7 @@
 import io
 import re
 from unittest import TestCase
+import unittest
 from unittest.mock import patch
 
 from sitemanager.commands import Commands, commands
@@ -27,3 +28,7 @@ class CommandTests(TestCase):
                 self.assertEqual(output[index], pattern)
             else:
                 self.assertRegex(output[index], pattern)
+
+
+if __name__ == "__main__":
+    unittest.main()

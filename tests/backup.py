@@ -2,6 +2,7 @@
 from datetime import datetime
 import os
 from unittest import TestCase
+import unittest
 from unittest.mock import MagicMock, patch
 
 from sitemanager.backup import (
@@ -128,3 +129,7 @@ class BackupTests(TestCase):
         mock_s3_backup_client.upload_archive.assert_called_with(
             archive_filepath)
         self.assertEqual(mock_shutil_rmtree.call_count, 2)
+
+
+if __name__ == "__main__":
+    unittest.main()

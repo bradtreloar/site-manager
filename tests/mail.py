@@ -1,5 +1,6 @@
 
 import os
+import unittest
 from unittest.mock import MagicMock, patch
 
 from sitemanager.mail import Mailer
@@ -63,3 +64,7 @@ class MailerTests(TestCaseWithConfig):
             context=mock_create_default_context.return_value)
         mock_smtp.login.assert_called()
         mock_smtp.sendmail.assert_called()
+
+
+if __name__ == "__main__":
+    unittest.main()

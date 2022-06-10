@@ -1,5 +1,6 @@
 
 from unittest import TestCase
+import unittest
 
 from sitemanager.database import BaseModel, get_db_session
 from sitemanager.sites import import_sites
@@ -102,3 +103,7 @@ class SiteTests(TestCaseWithDatabase):
         import_sites(sites_config, webauth_config, self.db_session)
         ssh_configs = self.db_session.query(SiteSSH).all()
         self.assertEqual(ssh_configs, [])
+
+
+if __name__ == "__main__":
+    unittest.main()

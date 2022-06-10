@@ -2,6 +2,7 @@
 from datetime import datetime
 from random import randint, choice as random_choice
 import string
+from sitemanager.config import AWSConfig
 
 from sitemanager.enums import SiteStatus, StatusLogType
 from sitemanager.models import StatusLogEntry
@@ -56,11 +57,14 @@ def fake_config(config={}):
     return default_config
 
 
-def fake_aws_config(config={}):
+def fake_aws_config(config: AWSConfig = {}) -> AWSConfig:
     return {
-        "region": random_string(20),
-        "aws_access_key_id": random_string(20),
-        "aws_secret_access_key": random_string(20),
+        "region": config.get(
+            "region", random_string(20)),
+        "aws_access_key_id": config.get(
+            "aws_access_key_id", random_string(20)),
+        "aws_secret_access_key": config.get(
+            "aws_secret_access_key", random_string(20)),
     }
 
 

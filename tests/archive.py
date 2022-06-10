@@ -1,4 +1,5 @@
 from unittest import TestCase
+import unittest
 from unittest.mock import patch
 
 from sitemanager.archive import make_gzipped_tarball
@@ -32,3 +33,7 @@ class ArchiveTests(TestCase):
         self.assertEqual(mock_path.join.call_count, 2)
         mock_makedirs.assert_called_with(
             mock_path.dirname.return_value, exist_ok=True)
+
+
+if __name__ == "__main__":
+    unittest.main()

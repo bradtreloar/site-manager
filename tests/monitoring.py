@@ -1,6 +1,7 @@
 
 from datetime import timedelta, timezone
 import io
+import unittest
 
 from httpx import Response
 import respx
@@ -60,3 +61,7 @@ class MonitoringTests(TestCaseWithDatabase):
             output = mock_stdout.getvalue()
             self.assertIn(site.host, output)
             self.assertIn("UP", output)
+
+
+if __name__ == "__main__":
+    unittest.main()
