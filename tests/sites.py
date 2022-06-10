@@ -66,21 +66,39 @@ class SiteTests(TestCaseWithDatabase):
         Imports SiteSSHConfig from config.
         """
         site = fake_site()
-        ssh_config = fake_site_ssh(site)
+        site_ssh = fake_site_ssh(site)
         sites_config = {
             site.host: {
                 "ssh": {
-                    "host": ssh_config.host,
-                    "port": ssh_config.port,
-                    "user": ssh_config.user,
-                    "key_filename": ssh_config.key_filename,
+                    "host": site_ssh.host,
+                    "port": site_ssh.port,
+                    "user": site_ssh.user,
+                    "key_filename": site_ssh.key_filename,
                 },
             }
         }
         webauth_config = {}
         import_sites(sites_config, webauth_config, self.db_session)
         ssh_configs = self.db_session.query(SiteSSH).all()
-        self.assertEqual(ssh_configs[0].host, ssh_config.host)
-        self.assertEqual(ssh_configs[0].port, ssh_config.port)
-        self.assertEqual(ssh_configs[0].user, ssh_config.user)
-        self.assertEqual(ssh_configs[0].key_filename, ssh_config.key_filename)
+        self.assertEqual(ssh_configs[0].host, site_ssh.host)
+        self.assertEqual(ssh_configs[0].port, site_ssh.port)
+        self.assertEqual(ssh_configs[0].user, site_ssh.user)
+        self.assertEqual(ssh_configs[0].key_filename, site_ssh.key_filename)
+
+    def test_deletes_ssh_config_missing_from_config(self):
+        """
+        Deletes existing SiteSSHConfig when existing config.
+        """
+        site = fake_site()
+        site_ssh = fake_site_ssh(site)
+        self.seed([
+            site,
+            site_ssh,
+        ])
+        sites_config = {
+            site.host: {}
+        }
+        webauth_config = {}
+        import_sites(sites_config, webauth_config, self.db_session)
+        ssh_configs = self.db_session.query(SiteSSH).all()
+        self.assertEqual(ssh_configs, [])
