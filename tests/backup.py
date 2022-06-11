@@ -73,7 +73,7 @@ class BackupTests(TestCase):
 
     @patch("os.makedirs")
     @patch("shutil.rmtree")
-    @patch("sitemanager.backup.S3BucketClient")
+    @patch("sitemanager.backup.S3Client")
     @patch("sitemanager.backup.datetime", wraps=datetime)
     @patch("sitemanager.backup.make_gzipped_tarball")
     @patch("sitemanager.backup.get_remote_client")
@@ -125,8 +125,8 @@ class BackupTests(TestCase):
         mock_os_makedirs.assert_not_called()
         mock_s3_backup_client_class.assert_called_with(
             aws_config, bucket_name)
-        mock_s3_backup_client.create.assert_called()
-        mock_s3_backup_client.upload_archive.assert_called_with(
+        mock_s3_backup_client.create_bucket.assert_called()
+        mock_s3_backup_client.upload_archive_to_bucket.assert_called_with(
             archive_filepath)
         self.assertEqual(mock_shutil_rmtree.call_count, 2)
 

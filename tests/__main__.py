@@ -2,7 +2,7 @@
 import unittest
 
 from tests.archive import ArchiveTests
-from tests.aws import S3BucketClientTests
+from tests.aws import S3ClientTests
 from tests.backup import BackupTests
 from tests.commands import CommandTests
 from tests.config import ConfigTests
@@ -20,7 +20,7 @@ TESTCASES = {
     MailerTests,
     MonitoringTests,
     AsyncMonitoringTests,
-    S3BucketClientTests,
+    S3ClientTests,
     SiteTests,
     TemplateTests
 }
