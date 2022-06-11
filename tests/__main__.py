@@ -6,6 +6,7 @@ from tests.aws import S3ClientTests
 from tests.backup import BackupTests
 from tests.commands import CommandTests
 from tests.config import ConfigTests
+from tests.database import DatabaseTests
 from tests.mail import MailerTests
 from tests.monitoring import MonitoringTests, AsyncMonitoringTests
 from tests.notifications import TemplateTests
@@ -17,6 +18,7 @@ TESTCASES = {
     BackupTests,
     CommandTests,
     ConfigTests,
+    DatabaseTests,
     MailerTests,
     MonitoringTests,
     AsyncMonitoringTests,

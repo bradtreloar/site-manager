@@ -2,7 +2,7 @@
 from datetime import datetime
 from random import randint, choice as random_choice
 import string
-from sitemanager.config import AWSConfig
+from sitemanager.config import AWSConfig, Config
 
 from sitemanager.enums import SiteStatus, StatusLogType
 from sitemanager.models import StatusLogEntry
@@ -19,7 +19,7 @@ def random_datetime(min=0, max=2000000000):
 
 
 def fake_config(config={}):
-    default_config = {
+    default_config: Config = {
         "database": {
             "path": ":memory:",
         },
