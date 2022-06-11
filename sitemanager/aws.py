@@ -2,21 +2,24 @@
 import os
 import boto3
 
+from sitemanager.config import AWSConfig
 
-class S3BucketClient:
 
-    def __init__(self, config, backup_bucket):
+class S3Client:
+
+    def __init__(self, config: AWSConfig, bucket_name: str):
         self.region = config["region"]
-        s3 = boto3.resource('s3',
-                            aws_access_key_id=config["aws_access_key_id"],
-                            aws_secret_access_key=config["aws_secret_access_key"])
-        self.bucket = s3.Bucket(backup_bucket)
+        s3 = boto3.resource(
+            's3',
+            aws_access_key_id=config["aws_access_key_id"],
+            aws_secret_access_key=config["aws_secret_access_key"])
+        self.bucket = s3.Bucket(bucket_name)
 
-    def exists(self):
+    def bucket_exists(self):
         return self.bucket.creation_date is not None
 
-    def create(self):
-        if not self.exists():
+    def create_bucket(self):
+        if not self.bucket_exists():
             self.bucket.create(
                 ACL='private',
                 CreateBucketConfiguration={
@@ -24,11 +27,11 @@ class S3BucketClient:
                 },
             )
 
-    def delete(self):
-        if self.exists():
+    def delete_bucket(self):
+        if self.bucket_exists():
             self.bucket.delete()
 
-    def get_summary(self):
+    def get_bucket_stats(self):
         total_size = 0
         archive_count = 0
         for object_summary in self.bucket.objects.all():
@@ -39,6 +42,6 @@ class S3BucketClient:
             "total_size": total_size,
         }
 
-    def upload_archive(self, archive_filepath):
+    def upload_archive_to_bucket(self, archive_filepath):
         filename = os.path.basename(archive_filepath)
         self.bucket.upload_file(archive_filepath, filename)

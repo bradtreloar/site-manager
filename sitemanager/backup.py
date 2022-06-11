@@ -4,7 +4,7 @@ import os
 import shutil
 
 from sitemanager.archive import make_gzipped_tarball
-from sitemanager.aws import S3BucketClient
+from sitemanager.aws import S3Client
 from sitemanager.config import AWSConfig, BackupConfig
 from sitemanager.models import Site
 from sitemanager.remote import get_remote_client
@@ -46,9 +46,9 @@ def backup_app(
     if is_s3_backup(backup_config):
         # Upload tarball to S3.
         bucket_name = backup_config["bucket"].format(site_host=site.host)
-        s3_backup_bucket_client = S3BucketClient(aws_config, bucket_name)
-        s3_backup_bucket_client.create()
-        s3_backup_bucket_client.upload_archive(archive_filepath)
+        s3_backup_bucket_client = S3Client(aws_config, bucket_name)
+        s3_backup_bucket_client.create_bucket()
+        s3_backup_bucket_client.upload_archive_to_bucket(archive_filepath)
     else:
         # Make sure destination directory exists then copy archive.
         dirpath = backup_config["path"]
