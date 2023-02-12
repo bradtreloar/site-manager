@@ -57,14 +57,3 @@ mail:
   username: xxxxxxxxxxxxxx
   password: xxxxxxxxxxxxxx
   use_tls: False
-
-# Juniper Web Authentication config
-#
-# Used to start a web authentication session for an SSH server.
-webauth:
-  # This key must match the site's SSH host.
-  ssh.example3.com:
-    login_url: "https://webauth.example.com"
-    webauth_url: "https://webauth.example.com/webauth_operation.php"
-    username: xxxxxxxxxxxxxx
-    password: xxxxxxxxxxxxxx

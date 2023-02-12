@@ -29,7 +29,6 @@ class CommandBase:
         start_time = perf_counter()
         import_sites(
             self.config["sites"],
-            self.config["webauth"],
             self.db_session)
         self.execute()
         duration = int((perf_counter() - start_time) * 1000)

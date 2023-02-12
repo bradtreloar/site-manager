@@ -47,39 +47,6 @@ class RemoteClient(ABC):
         scp_client = self.get_scp_client()
         scp_client.get(src, dest, recursive=True)
 
-    def start_webauth_session(self):
-        try:
-            config = self.config["webauth"]
-        except KeyError:
-            raise NoWebauthConfigException
-        session = Session()
-        response = session.post(config["login_url"], {
-            "login": "login",
-            "username": config["username"],
-            "password": config["password"],
-        }, params={
-            "target": "",
-            "auth_id": "",
-            "ap_name": "",
-        }, verify=False)
-        if response.status_code != 200:
-            raise LoginError
-        response = session.post(config["webauth_url"], {
-            "rs": "is_lsys_image_exist",
-            "rsargs[]": "root",
-            "csrf_token": "",
-        }, verify=False)
-        if response.status_code != 200:
-            raise WebauthError
-
 
 class LoginError(BaseException):
-    pass
-
-
-class WebauthError(BaseException):
-    pass
-
-
-class NoWebauthConfigException(BaseException):
     pass

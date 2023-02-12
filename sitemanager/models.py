@@ -43,7 +43,6 @@ class SiteSSH(BaseModel):
     port = Column(Integer, default=22, nullable=False)
     user = Column(String(255), nullable=False)
     key_filename = Column(String(1023))
-    webauth = Column(String(4095))
 
     site = relationship(Site, back_populates="ssh_config")
 
@@ -56,7 +55,6 @@ class SiteSSH(BaseModel):
             "port": self.port,
             "user": self.user,
             "key_filename": self.key_filename,
-            "webauth": json.loads(self.webauth) if self.webauth else None
         }
 
 

@@ -51,7 +51,6 @@ def fake_config(config={}):
             "password": "example_password",
             "use_tls": "False",
         },
-        "webauth": {},
     }
     default_config.update(config)
     return default_config

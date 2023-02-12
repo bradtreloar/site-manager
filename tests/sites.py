@@ -19,8 +19,7 @@ class SiteTests(TestCaseWithDatabase):
         sites_config = {
             site.host: {}
         }
-        webauth_config = {}
-        import_sites(sites_config, webauth_config, self.db_session)
+        import_sites(sites_config, self.db_session)
         sites = self.db_session.query(Site).all()
         self.assertEqual(sites[0].host, site.host)
 
@@ -37,9 +36,8 @@ class SiteTests(TestCaseWithDatabase):
         sites_config = {
             site.host: {}
         }
-        webauth_config = {}
         self.assertFalse(site.is_active)
-        import_sites(sites_config, webauth_config, self.db_session)
+        import_sites(sites_config, self.db_session)
         sites = self.db_session.query(Site).all()
         self.assertEqual(sites[0].host, site.host)
         self.assertTrue(sites[0].is_active)
@@ -55,9 +53,8 @@ class SiteTests(TestCaseWithDatabase):
             site
         ])
         sites_config = {}
-        webauth_config = {}
         self.assertTrue(site.is_active)
-        import_sites(sites_config, webauth_config, self.db_session)
+        import_sites(sites_config, self.db_session)
         sites = self.db_session.query(Site).all()
         self.assertEqual(sites[0].host, site.host)
         self.assertFalse(sites[0].is_active)
@@ -78,8 +75,7 @@ class SiteTests(TestCaseWithDatabase):
                 },
             }
         }
-        webauth_config = {}
-        import_sites(sites_config, webauth_config, self.db_session)
+        import_sites(sites_config, self.db_session)
         ssh_configs = self.db_session.query(SiteSSH).all()
         self.assertEqual(ssh_configs[0].host, site_ssh.host)
         self.assertEqual(ssh_configs[0].port, site_ssh.port)
@@ -99,8 +95,7 @@ class SiteTests(TestCaseWithDatabase):
         sites_config = {
             site.host: {}
         }
-        webauth_config = {}
-        import_sites(sites_config, webauth_config, self.db_session)
+        import_sites(sites_config, self.db_session)
         ssh_configs = self.db_session.query(SiteSSH).all()
         self.assertEqual(ssh_configs, [])
 

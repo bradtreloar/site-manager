@@ -4,12 +4,11 @@ from typing import Dict
 from sqlalchemy.orm.session import Session
 
 from sitemanager.models import Site, SiteSSH
-from sitemanager.config import SiteConfig, WebAuthItemConfig
+from sitemanager.config import SiteConfig
 
 
 def import_sites(
         sites_config: Dict[str, SiteConfig],
-        webauth_config: WebAuthItemConfig,
         db_session: Session):
 
     # Add site host to site config.
@@ -18,7 +17,7 @@ def import_sites(
 
     # Imports sites.
     for site_config in sites_config.values():
-        site = import_site(site_config, webauth_config, db_session)
+        site = import_site(site_config, db_session)
         db_session.commit()
 
     # Set sites as active/inactive depending on whether or not they are in the
@@ -29,10 +28,7 @@ def import_sites(
     db_session.commit()
 
 
-def import_site(
-        site_config: SiteConfig,
-        webauth_config: Dict[str, WebAuthItemConfig],
-        db_session: Session) -> Site:
+def import_site(site_config: SiteConfig, db_session: Session) -> Site:
     site_attributes = {
         "host": site_config["host"],
         "app": site_config.get("app"),
@@ -46,7 +42,7 @@ def import_site(
         site = Site(**site_attributes)
         db_session.add(site)
     if "ssh" in site_config:
-        import_site_ssh(site, site_config["ssh"], webauth_config, db_session)
+        import_site_ssh(site, site_config["ssh"], db_session)
     else:
         site_ssh = db_session.query(SiteSSH).filter(
             SiteSSH.site == site).scalar()
@@ -58,13 +54,10 @@ def import_site(
 def import_site_ssh(
         site: Site,
         ssh_config: SiteSSH,
-        webauth_config: Dict[str, WebAuthItemConfig],
         db_session: Session):
     if "host" not in ssh_config:
         ssh_config["host"] = site.host
     ssh_host = ssh_config["host"]
-    if ssh_host in webauth_config:
-        ssh_config["webauth"] = json.dumps(webauth_config[ssh_host])
     if site.ssh_config:
         for key, value in ssh_config.items():
             setattr(site.ssh_config, key, value)

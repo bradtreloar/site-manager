@@ -27,9 +27,8 @@ def backup_app(
     # Temporary directory for storing backups.
     backups_dirpath = TEMP_BACKUPS_DIR_TEMPLATE.format(site.host)
 
-    # Initialise app client, start webauth session.
+    # Initialise app client.
     app_client = get_remote_client(site.app)(site.ssh_config.to_dict())
-    app_client.start_webauth_session()
 
     # Download files to be backed up.
     app_client.export_databases(backups_dirpath)

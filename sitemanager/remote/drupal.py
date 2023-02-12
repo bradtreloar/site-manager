@@ -4,7 +4,7 @@ from io import StringIO
 import os
 import re
 import shutil
-from sitemanager.remote.client import NoWebauthConfigException, RemoteClient
+from sitemanager.remote.client import RemoteClient
 from sitemanager.remote.filesystem import exists, ls
 
 
@@ -96,9 +96,3 @@ class DrupalClient:
                 remote_path = "drupal/" + files_path + "/" + filename
                 local_path = os.path.join(dirpath, files_path, filename)
                 self.remote_client.download_file(remote_path, local_path)
-
-    def start_webauth_session(self):
-        try:
-            self.remote_client.start_webauth_session()
-        except NoWebauthConfigException:
-            pass

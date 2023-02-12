@@ -82,9 +82,3 @@ For multisite installations, replace `DEFAULT` with the site name, in all caps, 
 Examples:
 - A site called `shop` in sites.php will use `SHOP_DBNAME`.
 - A site called 'shop.example.com' in sites.php will use `SHOP_EXAMPLE_COM_DBNAME`.
-
-### Juniper firewall web authentication
-
-If any of the SSH hosts require Juniper web authentication, you can provide the configuration and the site manager will attempt to start a web authentication session before attempting to connect via SSH.
-
-This has only been tested on `webauth5.micron21.com` and may not work for any other firewalls.

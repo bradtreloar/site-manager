@@ -50,13 +50,6 @@ class SiteConfig(TypedDict):
     ssh: SiteSSHConfig
 
 
-class WebAuthItemConfig(TypedDict):
-    login_url: str
-    webauth_url: str
-    username: str
-    password: str
-
-
 class Config(TypedDict):
     aws: AWSConfig
     backup: BackupConfig
@@ -65,7 +58,6 @@ class Config(TypedDict):
     mail: MailConfig
     mailservice: MailserviceConfig
     sites: Dict[str, SiteConfig]
-    webauth: Dict[str, WebAuthItemConfig]
 
 
 def load_config(filepath: str) -> Config:
