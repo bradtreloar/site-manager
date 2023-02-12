@@ -43,7 +43,7 @@ def get_commandline_args():
     return parser.parse_args()
 
 
-def get_config(filepath: str):PathLike
+def get_config(filepath: str):
     with open(filepath) as file:
         return yaml.safe_load(file)
 
