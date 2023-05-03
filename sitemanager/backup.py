@@ -54,7 +54,7 @@ def backup_app(
         s3_backup_bucket_client.upload_archive_to_bucket(archive_filepath)
     else:
         print("- Copying to backup directory.")
-        dirpath = backup_config["path"]
+        dirpath = backup_config["path"].format(site_host=site.host)
         os.makedirs(dirpath, exist_ok=True)
         shutil.copy(archive_filepath, os.path.join(dirpath, archive_filename))
 
