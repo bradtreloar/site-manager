@@ -47,7 +47,7 @@ class WordpressClient:
         temporary_database_filepath = home_path + "/tmp/wordpress.sql"
         site_settings = self.site_settings()
         database_settings = site_settings["database"]
-        command = "MYSQL_PWD='{password}' mysqldump --user='{username}' '{database}' > {file}".format(
+        command = "MYSQL_PWD='{password}' mysqldump --no-tablespaces --user='{username}' '{database}' > {file}".format(
             database=database_settings["database"],
             username=database_settings["username"],
             password=database_settings["password"],

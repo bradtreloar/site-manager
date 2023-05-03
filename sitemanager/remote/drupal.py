@@ -74,14 +74,17 @@ class DrupalClient:
         self.remote_client.exec_command(f"mkdir -p {home_path}/tmp")
         temporary_database_filepath = f"{home_path}/tmp/drupal_{site_name}.sql"
         database_settings = site_settings["database"]
-        command = "MYSQL_PWD='{password}' mysqldump --user='{username}' '{database}' > {file}".format(
+        command = "MYSQL_PWD='{password}' mysqldump --no-tablespaces --user='{username}' '{database}' > {file}".format(
             database=database_settings["database"],
             username=database_settings["username"],
             password=database_settings["password"],
             file=temporary_database_filepath
         )
+        print(f"  - Exporting {site_name} database.")
         self.remote_client.exec_command(command)
+        print(f"  - Downloading {site_name} database file.")
         self.remote_client.download_file(temporary_database_filepath, filepath)
+        print(f"  - Deleting {site_name} database file.")
         self.remote_client.exec_command(f"rm {temporary_database_filepath}")
 
     def download_generated_files(self, dirpath):
@@ -89,6 +92,7 @@ class DrupalClient:
             self.download_site_files(site_name, dirpath)
 
     def download_site_files(self, site_name, dirpath):
+        print(f"  - Downloading {site_name} site files.")
         files_path = f"web/sites/{site_name}/files"
         os.makedirs(os.path.join(dirpath, files_path), exist_ok=True)
         for filename in ls(self.remote_client, "drupal/" + files_path):
